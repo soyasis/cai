@@ -12,8 +12,9 @@
 		CAI00005 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00006 /* ContentView.swift */; };
 		CAI00007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAI00008 /* Assets.xcassets */; };
 		CAI00026 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = CAI00027 /* HotKey */; };
-		CAI00029 /* ClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00030 /* ClipboardItem.swift */; };
-		CAI00031 /* ClipboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00032 /* ClipboardManager.swift */; };
+		CAI00035 /* PermissionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00036 /* PermissionsManager.swift */; };
+		CAI00037 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00038 /* HotKeyManager.swift */; };
+		CAI00039 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00040 /* ClipboardService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,8 +25,9 @@
 		CAI00009 /* Cai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cai.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAI00010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CAI00011 /* Cai.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Cai.entitlements; sourceTree = "<group>"; };
-		CAI00030 /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
-		CAI00032 /* ClipboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardManager.swift; sourceTree = "<group>"; };
+		CAI00036 /* PermissionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsManager.swift; sourceTree = "<group>"; };
+		CAI00038 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
+		CAI00040 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,8 +56,7 @@
 				CAI00002 /* CaiApp.swift */,
 				CAI00004 /* AppDelegate.swift */,
 				CAI00006 /* ContentView.swift */,
-				CAI00033 /* Models */,
-				CAI00034 /* Managers */,
+				CAI00041 /* Services */,
 				CAI00008 /* Assets.xcassets */,
 				CAI00010 /* Info.plist */,
 				CAI00011 /* Cai.entitlements */,
@@ -63,20 +64,14 @@
 			path = Cai;
 			sourceTree = "<group>";
 		};
-		CAI00033 /* Models */ = {
+		CAI00041 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				CAI00030 /* ClipboardItem.swift */,
+				CAI00036 /* PermissionsManager.swift */,
+				CAI00038 /* HotKeyManager.swift */,
+				CAI00040 /* ClipboardService.swift */,
 			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		CAI00034 /* Managers */ = {
-			isa = PBXGroup;
-			children = (
-				CAI00032 /* ClipboardManager.swift */,
-			);
-			path = Managers;
+			path = Services;
 			sourceTree = "<group>";
 		};
 		CAI00015 /* Products */ = {
@@ -165,8 +160,9 @@
 				CAI00005 /* ContentView.swift in Sources */,
 				CAI00001 /* CaiApp.swift in Sources */,
 				CAI00003 /* AppDelegate.swift in Sources */,
-				CAI00029 /* ClipboardItem.swift in Sources */,
-				CAI00031 /* ClipboardManager.swift in Sources */,
+				CAI00035 /* PermissionsManager.swift in Sources */,
+				CAI00037 /* HotKeyManager.swift in Sources */,
+				CAI00039 /* ClipboardService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,10 +303,9 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Cai/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -337,10 +332,9 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Cai/Info.plist;
 				INFOPLIST_KEY_LSUIElement = YES;
