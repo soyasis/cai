@@ -15,7 +15,19 @@
 		CAI00035 /* PermissionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00036 /* PermissionsManager.swift */; };
 		CAI00037 /* HotKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00038 /* HotKeyManager.swift */; };
 		CAI00039 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00040 /* ClipboardService.swift */; };
+		CAI00042 /* ContentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00043 /* ContentDetector.swift */; };
+		CAI00050 /* ContentDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00051 /* ContentDetectorTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CAI00052 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CAI00020 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAI00016;
+			remoteInfo = Cai;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		CAI00002 /* CaiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiApp.swift; sourceTree = "<group>"; };
@@ -28,6 +40,9 @@
 		CAI00036 /* PermissionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsManager.swift; sourceTree = "<group>"; };
 		CAI00038 /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
 		CAI00040 /* ClipboardService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardService.swift; sourceTree = "<group>"; };
+		CAI00043 /* ContentDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetector.swift; sourceTree = "<group>"; };
+		CAI00049 /* CaiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAI00051 /* ContentDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetectorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +54,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAI00053 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -46,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				CAI00014 /* Cai */,
+				CAI00054 /* CaiTests */,
 				CAI00015 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -70,6 +93,7 @@
 				CAI00036 /* PermissionsManager.swift */,
 				CAI00038 /* HotKeyManager.swift */,
 				CAI00040 /* ClipboardService.swift */,
+				CAI00043 /* ContentDetector.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -78,8 +102,17 @@
 			isa = PBXGroup;
 			children = (
 				CAI00009 /* Cai.app */,
+				CAI00049 /* CaiTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CAI00054 /* CaiTests */ = {
+			isa = PBXGroup;
+			children = (
+				CAI00051 /* ContentDetectorTests.swift */,
+			);
+			path = CaiTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -105,6 +138,24 @@
 			productReference = CAI00009 /* Cai.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CAI00048 /* CaiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAI00055 /* Build configuration list for PBXNativeTarget "CaiTests" */;
+			buildPhases = (
+				CAI00056 /* Sources */,
+				CAI00053 /* Frameworks */,
+				CAI00057 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAI00058 /* PBXTargetDependency */,
+			);
+			name = CaiTests;
+			productName = CaiTests;
+			productReference = CAI00049 /* CaiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -117,6 +168,10 @@
 				TargetAttributes = {
 					CAI00016 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					CAI00048 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = CAI00016;
 					};
 				};
 			};
@@ -137,6 +192,7 @@
 			projectRoot = "";
 			targets = (
 				CAI00016 /* Cai */,
+				CAI00048 /* CaiTests */,
 			);
 		};
 /* End PBXProject section */
@@ -147,6 +203,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAI00007 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAI00057 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,10 +226,27 @@
 				CAI00035 /* PermissionsManager.swift in Sources */,
 				CAI00037 /* HotKeyManager.swift in Sources */,
 				CAI00039 /* ClipboardService.swift in Sources */,
+				CAI00042 /* ContentDetector.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAI00056 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAI00050 /* ContentDetectorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CAI00058 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAI00016 /* Cai */;
+			targetProxy = CAI00052 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		CAI00022 /* Debug */ = {
@@ -351,6 +431,42 @@
 			};
 			name = Release;
 		};
+		CAI00059 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = T666G8244T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.cai.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cai.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Cai";
+			};
+			name = Debug;
+		};
+		CAI00060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = T666G8244T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourname.cai.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Cai.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Cai";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -368,6 +484,15 @@
 			buildConfigurations = (
 				CAI00022 /* Debug */,
 				CAI00023 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAI00055 /* Build configuration list for PBXNativeTarget "CaiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAI00059 /* Debug */,
+				CAI00060 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

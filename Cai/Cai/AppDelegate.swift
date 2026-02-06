@@ -6,6 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popover: NSPopover?
     private let hotKeyManager = HotKeyManager()
     private let clipboardService = ClipboardService.shared
+    private let contentDetector = ContentDetector.shared
     private let permissionsManager = PermissionsManager.shared
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -120,7 +121,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Then read the clipboard content after copy completes
             if let content = self?.clipboardService.readClipboard() {
                 print("📋 Clipboard content: \(content)")
-                // For now, just log to console - Phase 3 will add UI
+
+                // Detect content type
+                if let result = self?.contentDetector.detect(content) {
+                    print("🔍 Detected: \(result.type.rawValue) (confidence: \(result.confidence))")
+                    if let url = result.entities.url {
+                        print("   🔗 URL: \(url)")
+                    }
+                    if let address = result.entities.address {
+                        print("   📍 Address: \(address)")
+                    }
+                    if let date = result.entities.date {
+                        print("   📅 Date: \(date)")
+                    }
+                    if let dateText = result.entities.dateText {
+                        print("   📅 Date text: \(dateText)")
+                    }
+                    if let location = result.entities.location {
+                        print("   📍 Meeting location: \(location)")
+                    }
+                }
             } else {
                 print("⚠️ Clipboard is empty")
             }
