@@ -17,15 +17,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            // Use SF Symbol for clipboard
-            let image = NSImage(systemSymbolName: "clipboard", accessibilityDescription: "Cai")
-            image?.isTemplate = true
+            // Render CaiLogo Shape into a template NSImage for the menu bar
+            let logoHeight: CGFloat = 14
+            let logoWidth: CGFloat = logoHeight * (242.0 / 129.0)  // Preserve aspect ratio
+            let size = NSSize(width: logoWidth, height: logoHeight)
+            let image = NSImage(size: size, flipped: true) { rect in
+                guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
+                let swiftPath = CaiLogoShape().path(in: CGRect(origin: .zero, size: rect.size))
+                ctx.addPath(swiftPath.cgPath)
+                ctx.setFillColor(NSColor.black.cgColor)
+                ctx.fillPath()
+                return true
+            }
+            image.isTemplate = true  // Adapts to light/dark menu bar
             button.image = image
             button.action = #selector(handleStatusItemClick(_:))
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
-            print("Status bar item created with clipboard icon")
+            print("Status bar item created with Cai logo")
         } else {
             print("Failed to create status bar button")
         }
