@@ -2,12 +2,13 @@ import SwiftUI
 
 /// Shows the result of an action (LLM response, pretty-printed JSON, etc.)
 /// inside the floating window, replacing the action list.
-/// The result is automatically copied to the clipboard.
 /// Press Enter to copy and dismiss (toast shows confirmation).
 /// ESC returns to the action list (handled by parent).
 struct ResultView: View {
     let title: String
     let onBack: () -> Void
+    /// Called when the result is ready so the parent can copy on Enter.
+    var onResult: ((String) -> Void)?
 
     @State private var result: String = ""
     @State private var isLoading: Bool = true
@@ -97,8 +98,7 @@ struct ResultView: View {
                     result = output
                     isLoading = false
                 }
-                // Auto-copy to clipboard (silent — toast shows on Enter)
-                copyToClipboard(output)
+                onResult?(output)
             } catch {
                 withAnimation {
                     self.error = error.localizedDescription
@@ -122,10 +122,6 @@ struct ResultView: View {
                 .font(.system(size: 11))
         }
         .foregroundColor(.caiTextSecondary.opacity(0.6))
-    }
-
-    private func copyToClipboard(_ text: String) {
-        SystemActions.copyToClipboard(text)
     }
 
     /// Parses a markdown string into an AttributedString for rich rendering.

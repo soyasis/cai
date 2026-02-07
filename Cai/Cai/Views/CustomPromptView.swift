@@ -4,9 +4,12 @@ import SwiftUI
 /// and route keyboard events correctly.
 class CustomPromptState: ObservableObject {
     @Published var phase: CustomPromptPhase = .input
+    /// Holds the LLM result so the parent can copy it on Enter.
+    @Published var resultText: String = ""
 
     func reset() {
         phase = .input
+        resultText = ""
     }
 }
 
@@ -198,7 +201,7 @@ struct CustomPromptView: View {
                         result = output
                         isLoading = false
                     }
-                    SystemActions.copyToClipboard(output)
+                    state.resultText = output
                 }
             } catch {
                 await MainActor.run {

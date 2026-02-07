@@ -11,6 +11,7 @@ struct ActionListWindow: View {
     @State private var showResult: Bool = false
     @State private var resultTitle: String = ""
     @State private var resultGenerator: (() async throws -> String)?
+    @State private var pendingResultText: String = ""
     @State private var showSettings: Bool = false
     @State private var showHistory: Bool = false
     @State private var showCustomPrompt: Bool = false
@@ -61,6 +62,7 @@ struct ActionListWindow: View {
                 ResultView(
                     title: resultTitle,
                     onBack: { goBackToActions() },
+                    onResult: { text in pendingResultText = text },
                     generator: generator
                 )
             } else {
@@ -203,9 +205,15 @@ struct ActionListWindow: View {
             ClipboardHistory.shared.copyEntry(entries[index])
             copyAndDismissWithToast()
         case .result:
+            if !pendingResultText.isEmpty {
+                SystemActions.copyToClipboard(pendingResultText)
+            }
             copyAndDismissWithToast()
         case .customPrompt:
             if customPromptState.phase == .result {
+                if !customPromptState.resultText.isEmpty {
+                    SystemActions.copyToClipboard(customPromptState.resultText)
+                }
                 copyAndDismissWithToast()
             }
         default:
@@ -227,6 +235,7 @@ struct ActionListWindow: View {
             showResult = false
             resultGenerator = nil
             resultTitle = ""
+            pendingResultText = ""
         }
     }
 
