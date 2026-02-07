@@ -19,7 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem?.button {
             // Render CaiLogo Shape into a template NSImage for the menu bar
             let logoHeight: CGFloat = 11
-            let logoWidth: CGFloat = logoHeight * (242.0 / 129.0)  // Preserve aspect ratio
+            let logoWidth: CGFloat = logoHeight * (217.0 / 127.0)  // Preserve aspect ratio
             let size = NSSize(width: logoWidth, height: logoHeight)
             let image = NSImage(size: size, flipped: true) { rect in
                 guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
