@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 
 /// Persistent user settings stored in UserDefaults.
 class CaiSettings: ObservableObject {
@@ -13,6 +14,8 @@ class CaiSettings: ObservableObject {
         static let translationLanguage = "cai_translationLanguage"
         static let modelProvider = "cai_modelProvider"
         static let customModelURL = "cai_customModelURL"
+        static let mapsProvider = "cai_mapsProvider"
+        static let launchAtLogin = "cai_launchAtLogin"
     }
 
     // MARK: - Model Provider
@@ -34,6 +37,15 @@ class CaiSettings: ObservableObject {
         }
     }
 
+    // MARK: - Maps Provider
+
+    enum MapsProvider: String, CaseIterable, Identifiable {
+        case apple = "Apple Maps"
+        case google = "Google Maps"
+
+        var id: String { rawValue }
+    }
+
     // MARK: - Published Properties
 
     /// Base search URL. Query is percent-encoded and appended.
@@ -52,6 +64,17 @@ class CaiSettings: ObservableObject {
     /// Only used when modelProvider == .custom
     @Published var customModelURL: String {
         didSet { defaults.set(customModelURL, forKey: Keys.customModelURL) }
+    }
+
+    @Published var mapsProvider: MapsProvider {
+        didSet { defaults.set(mapsProvider.rawValue, forKey: Keys.mapsProvider) }
+    }
+
+    @Published var launchAtLogin: Bool {
+        didSet {
+            defaults.set(launchAtLogin, forKey: Keys.launchAtLogin)
+            updateLaunchAtLogin(launchAtLogin)
+        }
     }
 
     /// Resolved model base URL based on provider selection
@@ -86,5 +109,26 @@ class CaiSettings: ObservableObject {
 
         self.customModelURL = defaults.string(forKey: Keys.customModelURL)
             ?? "http://127.0.0.1:8080"
+
+        let mapsRaw = defaults.string(forKey: Keys.mapsProvider) ?? MapsProvider.apple.rawValue
+        self.mapsProvider = MapsProvider(rawValue: mapsRaw) ?? .apple
+
+        self.launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
+    }
+
+    // MARK: - Launch at Login
+
+    private func updateLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+                print("Launch at Login enabled")
+            } else {
+                try SMAppService.mainApp.unregister()
+                print("Launch at Login disabled")
+            }
+        } catch {
+            print("Failed to update Launch at Login: \(error)")
+        }
     }
 }
