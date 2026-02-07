@@ -3,6 +3,7 @@ import ApplicationServices
 
 class PermissionsManager: ObservableObject {
     @Published var hasAccessibilityPermission: Bool = false
+    private var pollTimer: Timer?
 
     static let shared = PermissionsManager()
 
@@ -68,22 +69,27 @@ class PermissionsManager: ObservableObject {
         NSWorkspace.shared.open(url)
     }
 
-    func recheckPermissionWhenAppBecomesActive() {
-        NotificationCenter.default.addObserver(
-            forName: NSApplication.didBecomeActiveNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
+    /// Polls for permission changes every 2 seconds until granted.
+    /// Menu bar apps (LSUIElement) don't reliably receive didBecomeActiveNotification,
+    /// so we poll instead.
+    func startPollingForPermission() {
+        guard !hasAccessibilityPermission else { return }
+
+        pollTimer?.invalidate()
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] timer in
+            guard let self = self else { timer.invalidate(); return }
             let hadPermission = self.hasAccessibilityPermission
             self.checkAccessibilityPermission()
 
-            // If permission status changed, post notification
-            if hadPermission != self.hasAccessibilityPermission {
-                NotificationCenter.default.post(
-                    name: NSNotification.Name("AccessibilityPermissionChanged"),
-                    object: nil
-                )
+            if self.hasAccessibilityPermission {
+                timer.invalidate()
+                self.pollTimer = nil
+                if !hadPermission {
+                    NotificationCenter.default.post(
+                        name: NSNotification.Name("AccessibilityPermissionChanged"),
+                        object: nil
+                    )
+                }
             }
         }
     }

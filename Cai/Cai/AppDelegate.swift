@@ -46,13 +46,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover?.behavior = .transient
         popover?.contentViewController = NSHostingController(rootView: SettingsView())
 
-        // Check accessibility permission
+        // Check accessibility permission and trigger system prompt if needed
         permissionsManager.checkAccessibilityPermission()
-        permissionsManager.recheckPermissionWhenAppBecomesActive()
 
-        // Show custom permission alert (without triggering the duplicate system prompt)
         if !permissionsManager.hasAccessibilityPermission {
-            permissionsManager.showPermissionAlert()
+            permissionsManager.requestAccessibilityPermission()
+            permissionsManager.startPollingForPermission()
         }
 
         // Setup global hotkey (Option+C)
@@ -191,15 +190,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        // Only simulate Cmd+C if the focused element actually has a text selection.
-        // This avoids the system error beep that apps play when Cmd+C fires with nothing selected.
-        if clipboardService.hasTextSelection() {
-            clipboardService.copySelectedText { [weak self] in
-                self?.openWithClipboard()
-            }
-        } else {
-            // No selection — skip Cmd+C and use whatever is already on the clipboard
-            openWithClipboard()
+        // Always simulate Cmd+C to capture the current selection.
+        // Most apps (browsers, mail clients) don't expose AXSelectedText,
+        // so we can't reliably check for a selection beforehand.
+        // If nothing is selected, Cmd+C is a no-op and we fall back to
+        // whatever is already on the clipboard.
+        clipboardService.copySelectedText { [weak self] in
+            self?.openWithClipboard()
         }
     }
 }

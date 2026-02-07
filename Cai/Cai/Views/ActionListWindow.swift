@@ -402,6 +402,7 @@ struct ActionListWindow: View {
         case .llmAction(let llmAction):
             let title = llmActionTitle(llmAction)
             let clipboardText = self.text
+            print("🔍 executeAction: self.text = \(clipboardText.prefix(80))...")
             showResultView(title: title) {
                 let llm = LLMService.shared
                 switch llmAction {
