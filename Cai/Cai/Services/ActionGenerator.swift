@@ -144,9 +144,10 @@ struct ActionGenerator {
                 icon: "calendar.badge.plus",
                 shortcut: shortcut,
                 type: .createCalendar(
-                    title: text,
+                    title: "Meeting",
                     date: detection.entities.date ?? Date(),
-                    location: detection.entities.location
+                    location: detection.entities.location,
+                    description: "\"\(text)\""
                 )
             ))
             shortcut += 1

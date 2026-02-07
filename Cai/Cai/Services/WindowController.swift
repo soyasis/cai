@@ -45,9 +45,13 @@ class WindowController: NSObject, ObservableObject {
     private static let maxWindowHeight: CGFloat = 600
     private static let cornerRadius: CGFloat = 20
 
-    /// Calculates dynamic window height based on action count.
+    /// Minimum visible rows — keeps the window from looking cramped when there are few actions.
+    private static let minVisibleRows: CGFloat = 3
+
+    /// Calculates dynamic window height based on action count, with a minimum of 3 rows.
     private func calculateWindowHeight(actionCount: Int) -> CGFloat {
-        let contentHeight = CGFloat(actionCount) * Self.rowHeight + Self.listVerticalPadding
+        let effectiveRows = max(CGFloat(actionCount), Self.minVisibleRows)
+        let contentHeight = effectiveRows * Self.rowHeight + Self.listVerticalPadding
         let totalHeight = Self.headerHeight + Self.dividerHeight + contentHeight + Self.dividerHeight + Self.footerHeight
         return min(totalHeight, Self.maxWindowHeight)
     }
@@ -356,8 +360,8 @@ class WindowController: NSObject, ObservableObject {
             SystemActions.searchWeb(query, searchBaseURL: CaiSettings.shared.searchURL)
             hideWindow()
 
-        case .createCalendar(let title, let date, let location):
-            SystemActions.createCalendarEvent(title: title, date: date, location: location)
+        case .createCalendar(let title, let date, let location, let description):
+            SystemActions.createCalendarEvent(title: title, date: date, location: location, description: description)
             hideWindow()
 
         default:

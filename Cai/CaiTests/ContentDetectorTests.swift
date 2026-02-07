@@ -207,6 +207,62 @@ final class ContentDetectorTests: XCTestCase {
         XCTAssertNotNil(result.entities.location)
     }
 
+    func testDetectsMeetingLocationCafeLaPalma() {
+        let result = detector.detect("Let's meet tomorrow at 3pm at Cafe La Palma?")
+        XCTAssertEqual(result.type, .meeting)
+        XCTAssertEqual(result.entities.location, "Cafe La Palma")
+    }
+
+    func testDetectsMeetingLocationWithTime() {
+        let result = detector.detect("Let's meet at Ramones Bar at 19h")
+        XCTAssertEqual(result.type, .meeting)
+        XCTAssertEqual(result.entities.location, "Ramones Bar")
+    }
+
+    func testDetectsMeetingLocationOnKeyword() {
+        let result = detector.detect("Meeting at The Blue Room on Friday")
+        XCTAssertEqual(result.type, .meeting)
+        XCTAssertEqual(result.entities.location, "The Blue Room")
+    }
+
+    // MARK: - Venue / Place Name Detection
+
+    func testDetectsVenueAtCafe() {
+        let result = detector.detect("at Cafe La Palma")
+        XCTAssertEqual(result.type, .address)
+        XCTAssertEqual(result.entities.location, "Cafe La Palma")
+    }
+
+    func testDetectsVenueInBar() {
+        let result = detector.detect("in Ramones Bar")
+        XCTAssertEqual(result.type, .address)
+        XCTAssertEqual(result.entities.location, "Ramones Bar")
+    }
+
+    func testDetectsVenueWithApostrophe() {
+        let result = detector.detect("at Joe's Diner")
+        XCTAssertEqual(result.type, .address)
+        XCTAssertEqual(result.entities.location, "Joe's Diner")
+    }
+
+    func testVenueSkipsLowercaseName() {
+        // "at home" — lowercase, should NOT be detected as a venue
+        let result = detector.detect("at home")
+        XCTAssertNotEqual(result.type, .address)
+    }
+
+    func testVenueSkipsTimeWord() {
+        // "at noon" — time word, not a venue
+        let result = detector.detect("at noon")
+        XCTAssertNotEqual(result.type, .address)
+    }
+
+    func testVenueDetectsCityName() {
+        let result = detector.detect("in London")
+        XCTAssertEqual(result.type, .address)
+        XCTAssertEqual(result.entities.location, "London")
+    }
+
     // MARK: - False Positive Filtering
 
     func testFiltersCurrencyDollar() {

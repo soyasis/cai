@@ -14,7 +14,7 @@ struct ActionItem: Identifiable {
 enum ActionType {
     case openURL(URL)
     case openMaps(String)
-    case createCalendar(title: String, date: Date, location: String?)
+    case createCalendar(title: String, date: Date, location: String?, description: String? = nil)
     case search(String)
     case llmAction(LLMAction)
     case jsonPrettyPrint(String)

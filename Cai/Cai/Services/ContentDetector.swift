@@ -48,13 +48,17 @@ class ContentDetector {
         // Priority 2: JSON
         if let result = detectJSON(trimmed) { return result }
 
-        // Priority 3: Address
+        // Priority 3: Address (street patterns + NSDataDetector)
         if let result = detectAddress(trimmed) { return result }
 
         // Priority 4: Date/Meeting
         if let result = detectMeeting(trimmed) { return result }
 
-        // Priority 5: Text classification (always succeeds)
+        // Priority 5: Venue / place name ("at Cafe La Palma", "in Ramones Bar")
+        // Runs after meeting so that date-bearing text gets the richer meeting result.
+        if let result = detectVenue(trimmed) { return result }
+
+        // Priority 6: Text classification (always succeeds)
         return classifyText(trimmed)
     }
 
@@ -225,25 +229,49 @@ class ContentDetector {
         let lowered = text.lowercased()
         let hasMeetingContext = meetingKeywords.contains { lowered.contains($0) }
 
-        // Extract location: look for "at [Location]" pattern
-        let locationPattern = #"(?i)\bat\s+([A-Z][\w\s']+?)(?:\s*[,.]|\s+(?:on|at|from|to|for)\b|$)"#
-        if let locationRegex = try? NSRegularExpression(pattern: locationPattern),
-           let locationMatch = locationRegex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-           locationMatch.numberOfRanges > 1,
-           let locationRange = Range(locationMatch.range(at: 1), in: text) {
-            let locationCandidate = String(text[locationRange]).trimmingCharacters(in: .whitespaces)
-            // Only use location if it looks like a place name (starts with uppercase, not a time word)
-            let timeWords = ["noon", "midnight", "night", "morning", "evening", "afternoon"]
-            if !timeWords.contains(locationCandidate.lowercased()) {
-                entities.location = locationCandidate
-            }
+        // Extract location: reuse shared venue name extractor
+        if let venueName = extractVenueName(text) {
+            entities.location = venueName
         }
 
         let confidence: Double = hasMeetingContext ? 0.9 : 0.7
         return ContentResult(type: .meeting, confidence: confidence, entities: entities)
     }
 
-    // MARK: - Text Classification (Fallback — Priority 5)
+    // MARK: - Venue / Place Name Detection (Priority 5)
+
+    /// Detects short venue references like "at Cafe La Palma" or "in Ramones Bar".
+    /// Place name must start with an uppercase letter to avoid false positives on
+    /// common phrases ("at home", "in the morning").
+    func detectVenue(_ text: String) -> ContentResult? {
+        guard let name = extractVenueName(text) else { return nil }
+        var entities = ContentEntities()
+        entities.address = name
+        entities.location = name
+        return ContentResult(type: .address, confidence: 0.6, entities: entities)
+    }
+
+    /// Shared helper: extracts a venue/place name from "at [Name]" or "in [Name]" patterns.
+    /// Case-sensitive on the place name (must start uppercase) to filter out noise.
+    private func extractVenueName(_ text: String) -> String? {
+        // "at/in" case-insensitive, place name must start with uppercase letter
+        let pattern = #"(?:^|\b)(?:[Aa][Tt]|[Ii][Nn])\s+([A-Z][\w\s'&-]+?)(?:\s*[,.!?]|\s+(?:on|at|from|to|for)\b|$)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              match.numberOfRanges > 1,
+              let range = Range(match.range(at: 1), in: text) else {
+            return nil
+        }
+        let candidate = String(text[range]).trimmingCharacters(in: .whitespaces)
+
+        // Skip time-of-day words
+        let timeWords = ["noon", "midnight", "night", "morning", "evening", "afternoon"]
+        guard !timeWords.contains(candidate.lowercased()) else { return nil }
+
+        return candidate
+    }
+
+    // MARK: - Text Classification (Fallback — Priority 6)
 
     func classifyText(_ text: String) -> ContentResult {
         let words = text.split(separator: " ")
