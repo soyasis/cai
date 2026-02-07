@@ -107,12 +107,10 @@ struct ActionListWindow: View {
     private func handleEsc() {
         if showCustomPrompt {
             if customPromptState.phase == .result {
-                // Go back from result to input phase
                 withAnimation(.easeInOut(duration: 0.15)) {
                     customPromptState.phase = .input
                 }
             } else {
-                // Go back from input to actions
                 withAnimation(.easeInOut(duration: 0.15)) {
                     showCustomPrompt = false
                     customPromptState.reset()
@@ -134,7 +132,6 @@ struct ActionListWindow: View {
     }
 
     private func handleShowHistory() {
-        // Only from the main action view
         guard activeScreen == .actions else { return }
         historySelectionState.selectedIndex = 0
         withAnimation(.easeInOut(duration: 0.15)) {
@@ -145,7 +142,6 @@ struct ActionListWindow: View {
     private func handleCmdNumber(_ number: Int) {
         switch activeScreen {
         case .actions:
-            // Execute the action with this shortcut number
             if let action = actions.first(where: { $0.shortcut == number }) {
                 if let index = actions.firstIndex(where: { $0.id == action.id }) {
                     selectionState.selectedIndex = index
@@ -153,7 +149,6 @@ struct ActionListWindow: View {
                 executeAction(action)
             }
         case .history:
-            // Copy the Nth history entry (1-indexed)
             let historyIndex = number - 1
             let entries = ClipboardHistory.shared.entries
             guard historyIndex >= 0, historyIndex < entries.count else { return }
@@ -208,22 +203,16 @@ struct ActionListWindow: View {
             ClipboardHistory.shared.copyEntry(entries[index])
             copyAndDismissWithToast()
         case .result:
-            // Copy result and dismiss with toast
             copyAndDismissWithToast()
         case .customPrompt:
             if customPromptState.phase == .result {
-                // Copy result and dismiss with toast
                 copyAndDismissWithToast()
             }
-            // Input phase: Enter passes through to TextEditor (handled by passThrough)
         default:
             break
         }
     }
 
-    /// Dismiss window and show "Copied to Clipboard" toast.
-    /// The result is already auto-copied on load, so this just confirms and closes.
-    /// Note: post toast notification BEFORE dismissing, since dismiss removes the observer.
     private func copyAndDismissWithToast() {
         NotificationCenter.default.post(
             name: NSNotification.Name("CaiShowToast"),
@@ -245,13 +234,11 @@ struct ActionListWindow: View {
 
     private var actionListContent: some View {
         VStack(spacing: 0) {
-            // Header
             headerView
 
             Divider()
                 .background(Color.caiDivider)
 
-            // Action list
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 2) {
@@ -277,7 +264,6 @@ struct ActionListWindow: View {
             Divider()
                 .background(Color.caiDivider)
 
-            // Footer — main action view
             mainFooterView
         }
     }
@@ -335,7 +321,6 @@ struct ActionListWindow: View {
 
             Spacer()
 
-            // Cai logo — settings entry point
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.15)) {
                     showSettings = true
@@ -415,16 +400,22 @@ struct ActionListWindow: View {
 
         case .llmAction(let llmAction):
             let title = llmActionTitle(llmAction)
+            let clipboardText = self.text
             showResultView(title: title) {
-                try await Task.sleep(nanoseconds: 500_000_000)
-                return Self.llmPlaceholder(action: llmAction, text: self.text)
+                let llm = LLMService.shared
+                switch llmAction {
+                case .summarize:
+                    return try await llm.summarize(clipboardText)
+                case .translate(let lang):
+                    return try await llm.translate(clipboardText, to: lang)
+                case .define:
+                    return try await llm.define(clipboardText)
+                case .explain:
+                    return try await llm.explain(clipboardText)
+                case .custom(let instruction):
+                    return try await llm.customAction(clipboardText, instruction: instruction)
+                }
             }
-
-        case .copyText(let copyText):
-            let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            pasteboard.setString(copyText, forType: .string)
-            onDismiss()
 
         case .customPrompt:
             customPromptState.reset()
@@ -433,6 +424,7 @@ struct ActionListWindow: View {
             }
 
         default:
+            // System actions (openURL, openMaps, search, createCalendar)
             onExecute(action)
         }
     }
@@ -465,21 +457,5 @@ struct ActionListWindow: View {
             return json
         }
         return result
-    }
-
-    private static func llmPlaceholder(action: LLMAction, text: String) -> String {
-        let preview = String(text.prefix(50))
-        switch action {
-        case .summarize:
-            return "[LLM Integration Pending]\n\nWill summarize: \"\(preview)...\""
-        case .translate(let lang):
-            return "[LLM Integration Pending]\n\nWill translate to \(lang): \"\(preview)...\""
-        case .define:
-            return "[LLM Integration Pending]\n\nWill define: \"\(text)\""
-        case .explain:
-            return "[LLM Integration Pending]\n\nWill explain: \"\(preview)...\""
-        case .custom(let prompt):
-            return "[LLM Integration Pending]\n\nPrompt: \(prompt)\nContent: \"\(preview)...\""
-        }
     }
 }

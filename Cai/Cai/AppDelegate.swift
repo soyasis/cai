@@ -9,8 +9,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let contentDetector = ContentDetector.shared
     private let windowController = WindowController()
     private let permissionsManager = PermissionsManager.shared
-    private var llmAvailable = false
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create the status item in the menu bar
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -135,21 +133,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let detection = self.contentDetector.detect(content)
                 print("Detected: \(detection.type.rawValue) (confidence: \(detection.confidence))")
 
-                // Check LLM availability, then show window
-                Task {
-                    let status = await LLMService.shared.checkStatus()
-                    await MainActor.run {
-                        self.llmAvailable = status.available
-                        if status.available, let model = status.modelName {
-                            print("LLM available: \(model)")
-                        }
-                        self.windowController.showActionWindow(
-                            text: content,
-                            detection: detection,
-                            llmAvailable: self.llmAvailable
-                        )
-                    }
-                }
+                // Show the action window immediately — LLM errors handled at execution time
+                self.windowController.showActionWindow(
+                    text: content,
+                    detection: detection
+                )
             } else {
                 print("Clipboard is empty")
             }

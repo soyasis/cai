@@ -185,22 +185,28 @@ struct CustomPromptView: View {
         withAnimation(.easeInOut(duration: 0.15)) {
             state.phase = .result
             isLoading = true
+            error = nil
         }
 
+        let textToProcess = clipboardText
         Task {
-            try? await Task.sleep(nanoseconds: 500_000_000)
-            let preview = String(clipboardText.prefix(50))
-            let output = "[LLM Integration Pending]\n\nPrompt: \(trimmed)\nContent: \"\(preview)...\""
+            do {
+                let output = try await LLMService.shared.customAction(textToProcess, instruction: trimmed)
 
-            await MainActor.run {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    result = output
-                    isLoading = false
+                await MainActor.run {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        result = output
+                        isLoading = false
+                    }
+                    SystemActions.copyToClipboard(output)
                 }
-                // Auto-copy to clipboard (silent — toast shows on Enter)
-                let pasteboard = NSPasteboard.general
-                pasteboard.clearContents()
-                pasteboard.setString(output, forType: .string)
+            } catch {
+                await MainActor.run {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        self.error = error.localizedDescription
+                        isLoading = false
+                    }
+                }
             }
         }
     }

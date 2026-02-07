@@ -57,7 +57,12 @@ class WindowController: NSObject, ObservableObject {
         // If window is already visible, dismiss first
         hideWindow()
 
-        let actions = ActionProvider.shared.actions(for: text, detection: detection)
+        let settings = CaiSettings.shared
+        let actions = ActionGenerator.generateActions(
+            for: text,
+            detection: detection,
+            settings: settings
+        )
         self.actions = actions
 
         // Reset selection state
@@ -178,7 +183,7 @@ class WindowController: NSObject, ObservableObject {
             self?.showToast(message: message)
         }
 
-        print("🪟 Action window shown with \(actions.count) actions (height: \(windowHeight))")
+        print("Action window shown with \(actions.count) actions (height: \(windowHeight))")
     }
 
     func hideWindow() {
@@ -206,7 +211,6 @@ class WindowController: NSObject, ObservableObject {
         window?.orderOut(nil)
         window = nil
         actions = []
-        print("🪟 Action window dismissed")
     }
 
     // MARK: - Position Persistence
@@ -309,8 +313,6 @@ class WindowController: NSObject, ObservableObject {
         if event.modifierFlags.contains(.command) {
             let keyNumber = keyCodeToNumber(event.keyCode)
             if let number = keyNumber, number >= 1 && number <= 9 {
-                // Post number for both action shortcuts and history shortcuts
-                // The active view decides what to do
                 NotificationCenter.default.post(
                     name: NSNotification.Name("CaiCmdNumber"),
                     object: nil,
@@ -343,37 +345,24 @@ class WindowController: NSObject, ObservableObject {
     private func executeSystemAction(_ action: ActionItem) {
         switch action.type {
         case .openURL(let url):
-            NSWorkspace.shared.open(url)
+            SystemActions.openURL(url)
             hideWindow()
 
         case .openMaps(let address):
-            let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? address
-            if let url = URL(string: "maps://?q=\(encoded)") {
-                NSWorkspace.shared.open(url)
-            }
+            SystemActions.openInMaps(address)
             hideWindow()
 
         case .search(let query):
-            if let url = CaiSettings.shared.searchEngine.searchURL(for: query) {
-                NSWorkspace.shared.open(url)
-            }
+            SystemActions.searchWeb(query, searchBaseURL: CaiSettings.shared.searchURL)
             hideWindow()
 
         case .createCalendar(let title, let date, let location):
-            createCalendarEvent(title: title, date: date, location: location)
-            hideWindow()
-
-        case .customPrompt:
-            // For now, placeholder — will open a text input in a future phase
-            print("📝 Custom prompt requested")
-            hideWindow()
-
-        case .translateCustom:
-            print("🌐 Custom translation requested")
+            SystemActions.createCalendarEvent(title: title, date: date, location: location)
             hideWindow()
 
         default:
-            hideWindow()
+            // LLM actions, JSON pretty print, custom prompt are handled by ActionListWindow
+            break
         }
     }
 
@@ -439,17 +428,6 @@ class WindowController: NSObject, ObservableObject {
             self?.toastWindow?.orderOut(nil)
             self?.toastWindow = nil
         })
-    }
-
-    private func createCalendarEvent(title: String, date: Date, location: String?) {
-        // Open Calendar app with the date — simplified for now
-        // Full EventKit integration would be a separate phase
-        let formatter = ISO8601DateFormatter()
-        let dateString = formatter.string(from: date)
-        if let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)") {
-            NSWorkspace.shared.open(url)
-        }
-        print("📅 Creating calendar event: \(title) at \(dateString)")
     }
 }
 

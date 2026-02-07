@@ -46,31 +46,37 @@ struct SettingsView: View {
                         }
                     }
 
-                    // Search Engine
-                    settingsSection(title: "Search Engine", icon: "magnifyingglass") {
+                    // Search URL
+                    settingsSection(title: "Search URL", icon: "magnifyingglass") {
                         VStack(alignment: .leading, spacing: 8) {
-                            Picker("", selection: $settings.searchEngine) {
-                                ForEach(CaiSettings.SearchEngine.allCases) { engine in
-                                    Text(engine.rawValue).tag(engine)
-                                }
-                            }
-                            .labelsHidden()
-                            .pickerStyle(.menu)
+                            TextField("https://search.brave.com/search?q=", text: $settings.searchURL)
+                                .textFieldStyle(.roundedBorder)
+                                .font(.system(size: 12, design: .monospaced))
 
-                            Text("Used for the Search Web action")
+                            Text("E.g. https://www.google.com/search?q=")
                                 .font(.system(size: 11))
                                 .foregroundColor(.caiTextSecondary)
                         }
                     }
 
-                    // Local Model URL
-                    settingsSection(title: "Local Model URL", icon: "cpu") {
+                    // Model Provider
+                    settingsSection(title: "Model Provider", icon: "cpu") {
                         VStack(alignment: .leading, spacing: 8) {
-                            TextField("http://127.0.0.1:1234", text: $settings.modelURL)
-                                .textFieldStyle(.roundedBorder)
-                                .font(.system(size: 12, design: .monospaced))
+                            Picker("", selection: $settings.modelProvider) {
+                                ForEach(CaiSettings.ModelProvider.allCases) { provider in
+                                    Text(provider.rawValue).tag(provider)
+                                }
+                            }
+                            .labelsHidden()
+                            .pickerStyle(.menu)
 
-                            Text("OpenAI-compatible API endpoint (e.g. LM Studio, Ollama)")
+                            if settings.modelProvider == .custom {
+                                TextField("http://127.0.0.1:8080", text: $settings.customModelURL)
+                                    .textFieldStyle(.roundedBorder)
+                                    .font(.system(size: 12, design: .monospaced))
+                            }
+
+                            Text("OpenAI-compatible API endpoint (\(settings.modelURL))")
                                 .font(.system(size: 11))
                                 .foregroundColor(.caiTextSecondary)
                         }

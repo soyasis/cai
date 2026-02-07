@@ -30,6 +30,10 @@
 		CAI00086 /* ClipboardHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00087 /* ClipboardHistory.swift */; };
 		CAI00088 /* ClipboardHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00089 /* ClipboardHistoryView.swift */; };
 		CAI00090 /* CustomPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00091 /* CustomPromptView.swift */; };
+		CAI00092 /* ToastWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00093 /* ToastWindow.swift */; };
+		CAI00100 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00101 /* LLMService.swift */; };
+		CAI00102 /* SystemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00103 /* SystemActions.swift */; };
+		CAI00104 /* ActionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00105 /* ActionGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +73,10 @@
 		CAI00087 /* ClipboardHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistory.swift; sourceTree = "<group>"; };
 		CAI00089 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
 		CAI00091 /* CustomPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPromptView.swift; sourceTree = "<group>"; };
+		CAI00093 /* ToastWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastWindow.swift; sourceTree = "<group>"; };
+		CAI00101 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
+		CAI00103 /* SystemActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemActions.swift; sourceTree = "<group>"; };
+		CAI00105 /* ActionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +144,7 @@
 				CAI00085 /* CaiLogo.swift */,
 				CAI00089 /* ClipboardHistoryView.swift */,
 				CAI00091 /* CustomPromptView.swift */,
+				CAI00093 /* ToastWindow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -149,6 +158,9 @@
 				CAI00043 /* ContentDetector.swift */,
 				CAI00075 /* WindowController.swift */,
 				CAI00087 /* ClipboardHistory.swift */,
+				CAI00101 /* LLMService.swift */,
+				CAI00103 /* SystemActions.swift */,
+				CAI00105 /* ActionGenerator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -295,6 +307,10 @@
 				CAI00086 /* ClipboardHistory.swift in Sources */,
 				CAI00088 /* ClipboardHistoryView.swift in Sources */,
 				CAI00090 /* CustomPromptView.swift in Sources */,
+				CAI00092 /* ToastWindow.swift in Sources */,
+				CAI00100 /* LLMService.swift in Sources */,
+				CAI00102 /* SystemActions.swift in Sources */,
+				CAI00104 /* ActionGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
