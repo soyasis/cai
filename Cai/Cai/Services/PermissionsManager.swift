@@ -12,7 +12,7 @@ class PermissionsManager: ObservableObject {
     }
 
     func checkAccessibilityPermission() {
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: false]
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: false]
         hasAccessibilityPermission = AXIsProcessTrustedWithOptions(options)
 
         if hasAccessibilityPermission {
@@ -24,7 +24,7 @@ class PermissionsManager: ObservableObject {
 
     func requestAccessibilityPermission() {
         // This will trigger the system prompt and add Cai to System Settings
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
         hasAccessibilityPermission = AXIsProcessTrustedWithOptions(options)
 
         // Make an actual accessibility API call to ensure the app appears in System Settings
