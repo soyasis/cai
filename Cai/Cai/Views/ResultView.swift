@@ -57,9 +57,14 @@ struct ResultView: View {
                             .font(.system(size: 12))
                             .foregroundColor(.caiTextSecondary)
                             .multilineTextAlignment(.center)
+                        Text("Check Settings \u{2192} Model Provider")
+                            .font(.system(size: 11))
+                            .foregroundColor(.caiTextSecondary.opacity(0.5))
                     }
                     .frame(maxWidth: .infinity, minHeight: 120)
                     .padding()
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Error: \(error)")
                 } else {
                     Text(result)
                         .font(.system(size: 13, design: .monospaced))

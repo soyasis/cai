@@ -333,6 +333,7 @@ struct ActionListWindow: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Open Settings")
             .onHover { hovering in
                 if hovering {
                     NSCursor.pointingHand.push()

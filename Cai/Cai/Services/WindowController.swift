@@ -139,8 +139,15 @@ class WindowController: NSObject, ObservableObject {
         self.window = panel
 
         // Activate our app temporarily so the panel can become key
+        panel.alphaValue = 0
         NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
+
+        // Fade in
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.15
+            panel.animator().alphaValue = 1
+        }
 
         // Monitor for clicks outside the window to dismiss (LOCAL events — within our app)
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
@@ -212,9 +219,21 @@ class WindowController: NSObject, ObservableObject {
             self.toastObserver = nil
         }
         Self.passThrough = false
-        window?.orderOut(nil)
-        window = nil
-        actions = []
+
+        // Fade out, then remove
+        if let window = window {
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.12
+                window.animator().alphaValue = 0
+            }, completionHandler: { [weak self] in
+                self?.window?.orderOut(nil)
+                self?.window = nil
+                self?.actions = []
+            })
+        } else {
+            window = nil
+            actions = []
+        }
     }
 
     // MARK: - Position Persistence

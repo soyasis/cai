@@ -5,6 +5,10 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settings = CaiSettings.shared
 
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
@@ -16,7 +20,7 @@ struct SettingsView: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.caiTextPrimary)
                 Spacer()
-                Text("v0.1.0")
+                Text("v\(appVersion)")
                     .font(.system(size: 11))
                     .foregroundColor(.caiTextSecondary.opacity(0.4))
             }
@@ -39,6 +43,7 @@ struct SettingsView: View {
                             }
                             .labelsHidden()
                             .pickerStyle(.menu)
+                            .accessibilityLabel("Translation language")
 
                             Text("Default language for the Translate action")
                                 .font(.system(size: 11))
@@ -48,15 +53,22 @@ struct SettingsView: View {
 
                     // Search URL
                     settingsSection(title: "Search URL", icon: "magnifyingglass") {
-                        VStack(alignment: .leading, spacing: 8) {
-                            TextField("https://search.brave.com/search?q=", text: $settings.searchURL)
-                                .textFieldStyle(.roundedBorder)
-                                .font(.system(size: 12, design: .monospaced))
+                        TextField("https://search.brave.com/search?q=", text: $settings.searchURL)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.system(size: 12, design: .monospaced))
+                            .accessibilityLabel("Search engine base URL")
+                    }
 
-                            Text("E.g. https://www.google.com/search?q=")
-                                .font(.system(size: 11))
-                                .foregroundColor(.caiTextSecondary)
+                    // Maps Provider
+                    settingsSection(title: "Maps", icon: "map") {
+                        Picker("", selection: $settings.mapsProvider) {
+                            ForEach(CaiSettings.MapsProvider.allCases) { provider in
+                                Text(provider.rawValue).tag(provider)
+                            }
                         }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .accessibilityLabel("Maps provider")
                     }
 
                     // Model Provider
@@ -69,11 +81,13 @@ struct SettingsView: View {
                             }
                             .labelsHidden()
                             .pickerStyle(.menu)
+                            .accessibilityLabel("LLM model provider")
 
                             if settings.modelProvider == .custom {
                                 TextField("http://127.0.0.1:8080", text: $settings.customModelURL)
                                     .textFieldStyle(.roundedBorder)
                                     .font(.system(size: 12, design: .monospaced))
+                                    .accessibilityLabel("Custom model URL")
                             }
 
                             Text("OpenAI-compatible API endpoint (\(settings.modelURL))")
@@ -82,12 +96,20 @@ struct SettingsView: View {
                         }
                     }
 
+                    // General
+                    settingsSection(title: "General", icon: "gearshape") {
+                        Toggle("Launch at Login", isOn: $settings.launchAtLogin)
+                            .font(.system(size: 12))
+                            .foregroundColor(.caiTextPrimary)
+                            .accessibilityLabel("Launch Cai at login")
+                    }
+
                     // Hotkey reminder
                     HStack(spacing: 6) {
                         Image(systemName: "keyboard")
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.caiTextSecondary.opacity(0.5))
-                        Text("Press ⌥C to trigger Cai anywhere")
+                        Text("Press \u{2325}C to trigger Cai anywhere")
                             .font(.system(size: 11))
                             .foregroundColor(.caiTextSecondary.opacity(0.5))
                     }

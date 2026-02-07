@@ -14,15 +14,10 @@ struct SystemActions {
 
     // MARK: - Maps
 
-    enum MapsProvider: String, CaseIterable, Identifiable {
-        case apple = "Apple Maps"
-        case google = "Google Maps"
-
-        var id: String { rawValue }
-    }
-
-    static func openInMaps(_ address: String, provider: MapsProvider = .apple) {
+    /// Opens an address in the user's preferred maps app (from Settings).
+    static func openInMaps(_ address: String) {
         let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? address
+        let provider = CaiSettings.shared.mapsProvider
         let urlString: String
         switch provider {
         case .apple:

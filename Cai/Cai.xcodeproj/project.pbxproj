@@ -34,6 +34,7 @@
 		CAI00100 /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00101 /* LLMService.swift */; };
 		CAI00102 /* SystemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00103 /* SystemActions.swift */; };
 		CAI00104 /* ActionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00105 /* ActionGenerator.swift */; };
+		CAI00106 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00107 /* AboutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		CAI00101 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		CAI00103 /* SystemActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemActions.swift; sourceTree = "<group>"; };
 		CAI00105 /* ActionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionGenerator.swift; sourceTree = "<group>"; };
+		CAI00107 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				CAI00089 /* ClipboardHistoryView.swift */,
 				CAI00091 /* CustomPromptView.swift */,
 				CAI00093 /* ToastWindow.swift */,
+				CAI00107 /* AboutView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				CAI00100 /* LLMService.swift in Sources */,
 				CAI00102 /* SystemActions.swift in Sources */,
 				CAI00104 /* ActionGenerator.swift in Sources */,
+				CAI00106 /* AboutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

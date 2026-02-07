@@ -82,7 +82,20 @@ actor LLMService {
         request.timeoutInterval = 30
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch let urlError as URLError {
+            switch urlError.code {
+            case .timedOut:
+                throw LLMError.timeout
+            case .cannotConnectToHost, .networkConnectionLost, .cannotFindHost:
+                throw LLMError.connectionFailed
+            default:
+                throw LLMError.connectionFailed
+            }
+        }
 
         guard let http = response as? HTTPURLResponse else {
             throw LLMError.invalidResponse
@@ -193,17 +206,23 @@ enum LLMError: LocalizedError {
     case invalidResponse
     case serverError(Int, String)
     case emptyResponse
+    case connectionFailed
+    case timeout
 
     var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "Invalid model URL. Check Settings."
+            return "Invalid model URL. Check Settings \u{2192} Model Provider."
         case .invalidResponse:
             return "Invalid response from server."
         case .serverError(let code, let body):
             return "Server error (\(code)): \(body)"
         case .emptyResponse:
             return "Empty response from model."
+        case .connectionFailed:
+            return "Could not connect to LLM server. Is it running?"
+        case .timeout:
+            return "Request timed out. Is your LLM server running?"
         }
     }
 }

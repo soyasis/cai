@@ -137,6 +137,9 @@ struct ClipboardHistoryView: View {
                 .fill(isSelected ? Color.caiSelection : Color.clear)
         )
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Clipboard entry \(index + 1): \(entry.preview)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: - Keyboard Hint

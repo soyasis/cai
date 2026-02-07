@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let windowController = WindowController()
     private let permissionsManager = PermissionsManager.shared
     private let clipboardHistory = ClipboardHistory.shared
+    private var aboutWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create the status item in the menu bar
@@ -24,14 +25,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.target = self
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
-            print("✅ Status bar item created with clipboard icon")
+            print("Status bar item created with clipboard icon")
         } else {
-            print("❌ Failed to create status bar button")
+            print("Failed to create status bar button")
         }
 
         // Create popover for left-click — shows settings
         popover = NSPopover()
-        popover?.contentSize = NSSize(width: 340, height: 380)
+        popover?.contentSize = NSSize(width: 340, height: 440)
         popover?.behavior = .transient
         popover?.contentViewController = NSHostingController(rootView: SettingsView())
 
@@ -49,7 +50,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // Setup global hotkey (⌥C - Option+C)
+        // Setup global hotkey (Option+C)
         setupHotKey()
 
         // Listen for permission changes to re-register hotkey
@@ -59,7 +60,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             queue: .main
         ) { [weak self] _ in
             if self?.permissionsManager.hasAccessibilityPermission == true {
-                print("🔄 Accessibility permission granted - re-registering hotkey")
+                print("Accessibility permission granted - re-registering hotkey")
                 self?.setupHotKey()
             }
         }
@@ -79,8 +80,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showMenu() {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
+
+        let openItem = NSMenuItem(title: "Open Cai", action: #selector(openCai), keyEquivalent: "")
+        menu.addItem(openItem)
+
         menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(title: "Preferences...", action: #selector(openSettings), keyEquivalent: ","))
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(title: "About Cai", action: #selector(showAbout), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Quit Cai", action: #selector(quitApp), keyEquivalent: "q"))
 
         statusItem?.menu = menu
@@ -104,12 +114,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         togglePopover()
     }
 
+    @objc func openCai() {
+        handleHotKeyTrigger()
+    }
+
+    @objc func showAbout() {
+        // If already open, bring to front
+        if let existing = aboutWindow, existing.isVisible {
+            existing.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let aboutView = AboutView()
+        let hostingView = NSHostingView(rootView: aboutView)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 260, height: 220),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "About Cai"
+        window.contentView = hostingView
+        window.isReleasedWhenClosed = false
+        window.center()
+
+        self.aboutWindow = window
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     @objc func quitApp() {
         NSApplication.shared.terminate(nil)
     }
 
     func setupHotKey() {
-        // Register Option+C (⌥C) as the global hotkey
+        // Register Option+C as the global hotkey
         hotKeyManager.register { [weak self] in
             self?.handleHotKeyTrigger()
         }
@@ -145,6 +186,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 )
             } else {
                 print("Clipboard is empty")
+                self.windowController.showToast(message: "Clipboard is empty")
             }
         }
     }

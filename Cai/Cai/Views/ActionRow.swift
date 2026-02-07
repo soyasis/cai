@@ -58,5 +58,8 @@ struct ActionRow: View {
                 .fill(isSelected ? Color.caiSelection : Color.clear)
         )
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(action.title)\(action.subtitle.map { ", \($0)" } ?? ""), Command \(action.shortcut)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
