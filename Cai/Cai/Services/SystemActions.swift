@@ -75,7 +75,8 @@ struct SystemActions {
             NSWorkspace.shared.open(tempURL)
 
             // Clean up temp file after Calendar.app has had time to read it
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            // (30s to handle slow launches or large calendars)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 30) {
                 try? FileManager.default.removeItem(at: tempURL)
             }
         } catch {
