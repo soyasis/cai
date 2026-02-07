@@ -155,6 +155,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    /// Reads clipboard content and shows the action window, or shows a toast if empty.
+    private func openWithClipboard() {
+        if let content = clipboardService.readClipboard() {
+            // Record to clipboard history
+            clipboardHistory.recordCurrentClipboard()
+
+            // Detect content type
+            let detection = contentDetector.detect(content)
+            print("Detected: \(detection.type.rawValue) (confidence: \(detection.confidence))")
+
+            // Show the action window immediately — LLM errors handled at execution time
+            windowController.showActionWindow(
+                text: content,
+                detection: detection
+            )
+        } else {
+            print("Clipboard is empty")
+            windowController.showToast(message: "Clipboard is empty")
+        }
+    }
+
     @objc func quitApp() {
         NSApplication.shared.terminate(nil)
     }
@@ -175,29 +196,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        // First, copy any selected text (simulates Cmd+C)
-        clipboardService.copySelectedText { [weak self] in
-            guard let self = self else { return }
-
-            // Read clipboard — works whether Cmd+C copied new text or clipboard already had content.
-            // This means Option+C with no selection will re-use the last clipboard contents.
-            if let content = self.clipboardService.readClipboard() {
-                // Record to clipboard history
-                self.clipboardHistory.recordCurrentClipboard()
-
-                // Detect content type
-                let detection = self.contentDetector.detect(content)
-                print("Detected: \(detection.type.rawValue) (confidence: \(detection.confidence))")
-
-                // Show the action window immediately — LLM errors handled at execution time
-                self.windowController.showActionWindow(
-                    text: content,
-                    detection: detection
-                )
-            } else {
-                print("Clipboard is empty")
-                self.windowController.showToast(message: "Clipboard is empty")
+        // Only simulate Cmd+C if the focused element actually has a text selection.
+        // This avoids the system error beep that apps play when Cmd+C fires with nothing selected.
+        if clipboardService.hasTextSelection() {
+            clipboardService.copySelectedText { [weak self] in
+                self?.openWithClipboard()
             }
+        } else {
+            // No selection — skip Cmd+C and use whatever is already on the clipboard
+            openWithClipboard()
         }
     }
 }

@@ -6,6 +6,34 @@ class ClipboardService {
 
     private init() {}
 
+    /// Checks if the focused UI element in the frontmost app has a non-empty text selection.
+    /// Uses the Accessibility API (AXUIElement) to query `kAXSelectedTextAttribute`.
+    /// Returns false if there's no selection, no focused element, or the query fails.
+    func hasTextSelection() -> Bool {
+        let systemWide = AXUIElementCreateSystemWide()
+        var focusedElement: CFTypeRef?
+        let focusResult = AXUIElementCopyAttributeValue(
+            systemWide,
+            kAXFocusedUIElementAttribute as CFString,
+            &focusedElement
+        )
+        guard focusResult == .success, let element = focusedElement else {
+            return false
+        }
+
+        var selectedText: CFTypeRef?
+        let textResult = AXUIElementCopyAttributeValue(
+            element as! AXUIElement,
+            kAXSelectedTextAttribute as CFString,
+            &selectedText
+        )
+        guard textResult == .success, let text = selectedText as? String else {
+            return false
+        }
+
+        return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     /// Simulates Cmd+C by posting CGEvents directly to the frontmost application.
     ///
     /// This is the same technique used by Raycast, Rectangle, and other macOS utilities.
