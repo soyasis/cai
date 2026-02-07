@@ -27,10 +27,13 @@ class WindowController: NSObject, ObservableObject {
     /// instead of being consumed by the keyboard handler. Set by views with text input.
     static var passThrough = false
     private var window: NSWindow?
+    private var toastWindow: NSWindow?
     private var actions: [ActionItem] = []
     private var selectionState = SelectionState()
     private var localMonitor: Any?
     private var globalMonitor: Any?
+    private var keyMonitor: Any?
+    private var toastObserver: NSObjectProtocol?
 
     /// Layout constants
     private static let windowWidth: CGFloat = 500
@@ -155,6 +158,26 @@ class WindowController: NSObject, ObservableObject {
             self?.hideWindow()
         }
 
+        // Monitor for key events — fires BEFORE the first responder chain,
+        // so ESC works even when a TextField/TextEditor is focused.
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self, self.window != nil else { return event }
+            if self.handleKeyEvent(event) {
+                return nil  // Consumed — suppress the event
+            }
+            return event  // Pass through to responder chain
+        }
+
+        // Listen for toast notifications from SwiftUI views
+        toastObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("CaiShowToast"),
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            let message = notification.userInfo?["message"] as? String ?? "Copied to Clipboard"
+            self?.showToast(message: message)
+        }
+
         print("🪟 Action window shown with \(actions.count) actions (height: \(windowHeight))")
     }
 
@@ -170,6 +193,14 @@ class WindowController: NSObject, ObservableObject {
         if let globalMonitor = globalMonitor {
             NSEvent.removeMonitor(globalMonitor)
             self.globalMonitor = nil
+        }
+        if let keyMonitor = keyMonitor {
+            NSEvent.removeMonitor(keyMonitor)
+            self.keyMonitor = nil
+        }
+        if let toastObserver = toastObserver {
+            NotificationCenter.default.removeObserver(toastObserver)
+            self.toastObserver = nil
         }
         Self.passThrough = false
         window?.orderOut(nil)
@@ -221,7 +252,17 @@ class WindowController: NSObject, ObservableObject {
             return true
         }
 
-        // When a text field is active, let Return and arrows pass through
+        // Cmd+Return — always captured (submit in custom prompt, or copy result)
+        if event.keyCode == 36 && event.modifierFlags.contains(.command) {
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CaiCmdEnterPressed"),
+                object: nil
+            )
+            return true
+        }
+
+        // When a text editor is active, let plain Return and arrows pass through
+        // (Return adds newlines, arrows move cursor)
         if Self.passThrough {
             if event.keyCode == 126 || event.keyCode == 125 || event.keyCode == 36 {
                 return false
@@ -334,6 +375,70 @@ class WindowController: NSObject, ObservableObject {
         default:
             hideWindow()
         }
+    }
+
+    // MARK: - Toast Notification
+
+    /// Shows a pill-shaped toast notification that auto-dismisses after 1.5 seconds.
+    func showToast(message: String) {
+        hideToast()
+
+        let toastView = ToastView(message: message)
+        let hostingView = NSHostingView(rootView: toastView)
+        hostingView.wantsLayer = true
+
+        // Size the hosting view to fit content
+        let fittingSize = hostingView.fittingSize
+        let width = max(fittingSize.width, 200)
+        let height = max(fittingSize.height, 36)
+
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: width, height: height),
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
+        panel.level = .statusBar
+        panel.isMovableByWindowBackground = false
+        panel.contentView = hostingView
+        panel.ignoresMouseEvents = true
+
+        // Position at top-center of screen
+        if let screen = NSScreen.main ?? NSScreen.screens.first {
+            let screenFrame = screen.visibleFrame
+            let x = screenFrame.midX - width / 2
+            let y = screenFrame.maxY - 80
+            panel.setFrameOrigin(NSPoint(x: x, y: y))
+        }
+
+        self.toastWindow = panel
+        panel.alphaValue = 0
+        panel.orderFront(nil)
+
+        // Fade in
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.2
+            panel.animator().alphaValue = 1
+        }
+
+        // Auto-dismiss after 1.5 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.hideToast()
+        }
+    }
+
+    private func hideToast() {
+        guard let toast = toastWindow else { return }
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.2
+            toast.animator().alphaValue = 0
+        }, completionHandler: { [weak self] in
+            self?.toastWindow?.orderOut(nil)
+            self?.toastWindow = nil
+        })
     }
 
     private func createCalendarEvent(title: String, date: Date, location: String?) {
