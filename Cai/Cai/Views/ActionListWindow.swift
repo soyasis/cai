@@ -12,9 +12,23 @@ struct ActionListWindow: View {
     @State private var resultTitle: String = ""
     @State private var resultGenerator: (() async throws -> String)?
     @State private var showSettings: Bool = false
+    @State private var showHistory: Bool = false
+    @StateObject private var historySelectionState = SelectionState()
 
     /// Corner radius matching Spotlight's rounded appearance
     private let cornerRadius: CGFloat = 20
+
+    /// Which screen is currently active — used for keyboard routing
+    private var activeScreen: Screen {
+        if showSettings { return .settings }
+        if showHistory { return .history }
+        if showResult { return .result }
+        return .actions
+    }
+
+    private enum Screen {
+        case actions, result, settings, history
+    }
 
     var body: some View {
         ZStack {
@@ -22,6 +36,19 @@ struct ActionListWindow: View {
 
             if showSettings {
                 settingsContent
+            } else if showHistory {
+                ClipboardHistoryView(
+                    selectionState: historySelectionState,
+                    onSelect: { entry in
+                        ClipboardHistory.shared.copyEntry(entry)
+                        onDismiss()
+                    },
+                    onBack: {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            showHistory = false
+                        }
+                    }
+                )
             } else if showResult, let generator = resultGenerator {
                 ResultView(
                     title: resultTitle,
@@ -48,22 +75,119 @@ struct ActionListWindow: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiEscPressed"))) { _ in
             handleEsc()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiShowClipboardHistory"))) { _ in
+            handleShowHistory()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiCmdNumber"))) { notification in
+            if let number = notification.userInfo?["number"] as? Int {
+                handleCmdNumber(number)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiArrowUp"))) { _ in
+            handleArrowUp()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiArrowDown"))) { _ in
+            handleArrowDown()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiEnterPressed"))) { _ in
+            handleEnter()
+        }
     }
 
-    // MARK: - ESC Logic
+    // MARK: - Keyboard Routing
 
     private func handleEsc() {
         if showSettings {
-            // Settings → back to action list
             withAnimation(.easeInOut(duration: 0.15)) {
                 showSettings = false
             }
+        } else if showHistory {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showHistory = false
+            }
         } else if showResult {
-            // Result view → back to action list
             goBackToActions()
         } else {
-            // Action list (main view) → close window
             onDismiss()
+        }
+    }
+
+    private func handleShowHistory() {
+        // Only from the main action view
+        guard activeScreen == .actions else { return }
+        historySelectionState.selectedIndex = 0
+        withAnimation(.easeInOut(duration: 0.15)) {
+            showHistory = true
+        }
+    }
+
+    private func handleCmdNumber(_ number: Int) {
+        switch activeScreen {
+        case .actions:
+            // Execute the action with this shortcut number
+            if let action = actions.first(where: { $0.shortcut == number }) {
+                if let index = actions.firstIndex(where: { $0.id == action.id }) {
+                    selectionState.selectedIndex = index
+                }
+                executeAction(action)
+            }
+        case .history:
+            // Copy the Nth history entry (1-indexed)
+            let historyIndex = number - 1
+            let entries = ClipboardHistory.shared.entries
+            guard historyIndex >= 0, historyIndex < entries.count else { return }
+            historySelectionState.selectedIndex = historyIndex
+            ClipboardHistory.shared.copyEntry(entries[historyIndex])
+            onDismiss()
+        default:
+            break
+        }
+    }
+
+    private func handleArrowUp() {
+        switch activeScreen {
+        case .actions:
+            let current = selectionState.selectedIndex
+            selectionState.selectedIndex = current > 0 ? current - 1 : actions.count - 1
+        case .history:
+            let entries = ClipboardHistory.shared.entries
+            guard !entries.isEmpty else { return }
+            let current = historySelectionState.selectedIndex
+            historySelectionState.selectedIndex = current > 0 ? current - 1 : entries.count - 1
+        default:
+            break
+        }
+    }
+
+    private func handleArrowDown() {
+        switch activeScreen {
+        case .actions:
+            let current = selectionState.selectedIndex
+            selectionState.selectedIndex = current < actions.count - 1 ? current + 1 : 0
+        case .history:
+            let entries = ClipboardHistory.shared.entries
+            guard !entries.isEmpty else { return }
+            let current = historySelectionState.selectedIndex
+            historySelectionState.selectedIndex = current < entries.count - 1 ? current + 1 : 0
+        default:
+            break
+        }
+    }
+
+    private func handleEnter() {
+        switch activeScreen {
+        case .actions:
+            let index = selectionState.selectedIndex
+            guard index < actions.count else { return }
+            executeAction(actions[index])
+        case .history:
+            let entries = ClipboardHistory.shared.entries
+            let index = historySelectionState.selectedIndex
+            guard index < entries.count else { return }
+            ClipboardHistory.shared.copyEntry(entries[index])
+            onDismiss()
+        default:
+            break
         }
     }
 
@@ -123,7 +247,6 @@ struct ActionListWindow: View {
             SettingsView()
             Divider()
                 .background(Color.caiDivider)
-            // Footer with back hint
             HStack(spacing: 16) {
                 keyboardHint(key: "Esc", label: "Back")
                 Spacer()
@@ -166,6 +289,7 @@ struct ActionListWindow: View {
             keyboardHint(key: "↑↓", label: "Navigate")
             keyboardHint(key: "↵", label: "Select")
             keyboardHint(key: "Esc", label: "Close")
+            keyboardHint(key: "⌘0", label: "History")
 
             Spacer()
 
@@ -250,7 +374,6 @@ struct ActionListWindow: View {
         case .llmAction(let llmAction):
             let title = llmActionTitle(llmAction)
             showResultView(title: title) {
-                // Placeholder — will be replaced with real LLM calls in a later phase
                 try await Task.sleep(nanoseconds: 500_000_000)
                 return Self.llmPlaceholder(action: llmAction, text: self.text)
             }
@@ -262,7 +385,6 @@ struct ActionListWindow: View {
             onDismiss()
 
         default:
-            // For openURL, openMaps, search, createCalendar, customPrompt — delegate up
             onExecute(action)
         }
     }
@@ -285,7 +407,7 @@ struct ActionListWindow: View {
         }
     }
 
-    // MARK: - Static helpers (for async context)
+    // MARK: - Static helpers
 
     private static func prettyPrintJSON(_ json: String) -> String {
         guard let data = json.data(using: .utf8),

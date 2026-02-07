@@ -27,6 +27,8 @@
 		CAI00080 /* CaiSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00081 /* CaiSettings.swift */; };
 		CAI00082 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00083 /* SettingsView.swift */; };
 		CAI00084 /* CaiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00085 /* CaiLogo.swift */; };
+		CAI00086 /* ClipboardHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00087 /* ClipboardHistory.swift */; };
+		CAI00088 /* ClipboardHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00089 /* ClipboardHistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +65,8 @@
 		CAI00081 /* CaiSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiSettings.swift; sourceTree = "<group>"; };
 		CAI00083 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		CAI00085 /* CaiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiLogo.swift; sourceTree = "<group>"; };
+		CAI00087 /* ClipboardHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistory.swift; sourceTree = "<group>"; };
+		CAI00089 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +132,7 @@
 				CAI00073 /* ResultView.swift */,
 				CAI00083 /* SettingsView.swift */,
 				CAI00085 /* CaiLogo.swift */,
+				CAI00089 /* ClipboardHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -140,6 +145,7 @@
 				CAI00040 /* ClipboardService.swift */,
 				CAI00043 /* ContentDetector.swift */,
 				CAI00075 /* WindowController.swift */,
+				CAI00087 /* ClipboardHistory.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -283,6 +289,8 @@
 				CAI00080 /* CaiSettings.swift in Sources */,
 				CAI00082 /* SettingsView.swift in Sources */,
 				CAI00084 /* CaiLogo.swift in Sources */,
+				CAI00086 /* ClipboardHistory.swift in Sources */,
+				CAI00088 /* ClipboardHistoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -217,33 +217,39 @@ class WindowController: NSObject, ObservableObject {
             return true
         }
 
-        // Arrow Up — wraps from first to last
+        // Arrow Up
         if event.keyCode == 126 {
-            let current = selectionState.selectedIndex
-            if current > 0 {
-                selectionState.selectedIndex = current - 1
-            } else {
-                selectionState.selectedIndex = actions.count - 1
-            }
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CaiArrowUp"),
+                object: nil
+            )
             return true
         }
 
-        // Arrow Down — wraps from last to first
+        // Arrow Down
         if event.keyCode == 125 {
-            let current = selectionState.selectedIndex
-            if current < actions.count - 1 {
-                selectionState.selectedIndex = current + 1
-            } else {
-                selectionState.selectedIndex = 0
-            }
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CaiArrowDown"),
+                object: nil
+            )
             return true
         }
 
         // Return/Enter
         if event.keyCode == 36 {
-            let index = selectionState.selectedIndex
-            guard index < actions.count else { return true }
-            executeOrDelegateAction(actions[index])
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CaiEnterPressed"),
+                object: nil
+            )
+            return true
+        }
+
+        // Cmd+0 — open clipboard history
+        if event.modifierFlags.contains(.command) && event.keyCode == 29 {  // 29 = '0'
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CaiShowClipboardHistory"),
+                object: nil
+            )
             return true
         }
 
@@ -251,36 +257,18 @@ class WindowController: NSObject, ObservableObject {
         if event.modifierFlags.contains(.command) {
             let keyNumber = keyCodeToNumber(event.keyCode)
             if let number = keyNumber, number >= 1 && number <= 9 {
-                // Find the action with this shortcut number
-                if let action = actions.first(where: { $0.shortcut == number }) {
-                    // Update selection to that action
-                    if let index = actions.firstIndex(where: { $0.id == action.id }) {
-                        selectionState.selectedIndex = index
-                    }
-                    executeOrDelegateAction(action)
-                    return true
-                }
+                // Post number for both action shortcuts and history shortcuts
+                // The active view decides what to do
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("CaiCmdNumber"),
+                    object: nil,
+                    userInfo: ["number": number]
+                )
+                return true
             }
         }
 
         return false
-    }
-
-    /// Execute an action — either handle system actions here, or let SwiftUI handle inline actions.
-    private func executeOrDelegateAction(_ action: ActionItem) {
-        switch action.type {
-        case .llmAction, .jsonPrettyPrint, .copyText:
-            // These are handled inline in SwiftUI via the onExecute/ActionListWindow
-            // Post a notification so the SwiftUI view can pick it up
-            NotificationCenter.default.post(
-                name: NSNotification.Name("CaiExecuteAction"),
-                object: nil,
-                userInfo: ["actionId": action.id]
-            )
-        default:
-            // System actions handled by WindowController
-            executeSystemAction(action)
-        }
     }
 
     private func keyCodeToNumber(_ keyCode: UInt16) -> Int? {
