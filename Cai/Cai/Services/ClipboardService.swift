@@ -90,15 +90,26 @@ class ClipboardService {
 
         print("⌨️ Posted Cmd+C via CGEvent (private source) to frontmost app")
 
-        // Wait for the target app to process the copy command and update the
-        // pasteboard. 200ms provides a reliable window for most apps.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        // Poll for pasteboard changes every 50ms, up to 500ms.
+        // A fixed delay is too short for heavy apps (Electron, IDEs).
+        var attempts = 0
+        let maxAttempts = 10  // 10 × 50ms = 500ms max
+        func checkPasteboard() {
+            attempts += 1
             if pasteboard.changeCount > changeCountBefore {
-                print("✂️ Text copied to clipboard (pasteboard changed)")
+                print("✂️ Text copied to clipboard (pasteboard changed after \(attempts * 50)ms)")
+                completion()
+            } else if attempts >= maxAttempts {
+                print("⚠️ Pasteboard unchanged after \(maxAttempts * 50)ms — no text was selected, or app too slow")
+                completion()
             } else {
-                print("⚠️ Pasteboard unchanged — no text was selected, or copy was too slow")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    checkPasteboard()
+                }
             }
-            completion()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            checkPasteboard()
         }
     }
 
