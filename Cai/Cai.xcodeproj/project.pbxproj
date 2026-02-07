@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		CAI00001 /* CaiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00002 /* CaiApp.swift */; };
 		CAI00003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00004 /* AppDelegate.swift */; };
-		CAI00005 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00006 /* ContentView.swift */; };
 		CAI00007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAI00008 /* Assets.xcassets */; };
 		CAI00026 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = CAI00027 /* HotKey */; };
 		CAI00035 /* PermissionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00036 /* PermissionsManager.swift */; };
@@ -35,6 +34,8 @@
 		CAI00102 /* SystemActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00103 /* SystemActions.swift */; };
 		CAI00104 /* ActionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00105 /* ActionGenerator.swift */; };
 		CAI00106 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00107 /* AboutView.swift */; };
+		CAI00108 /* KeyboardHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00109 /* KeyboardHint.swift */; };
+		CAI00110 /* CaiNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00111 /* CaiNotifications.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +51,6 @@
 /* Begin PBXFileReference section */
 		CAI00002 /* CaiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiApp.swift; sourceTree = "<group>"; };
 		CAI00004 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CAI00006 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CAI00008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CAI00009 /* Cai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cai.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAI00010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -79,6 +79,8 @@
 		CAI00103 /* SystemActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemActions.swift; sourceTree = "<group>"; };
 		CAI00105 /* ActionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionGenerator.swift; sourceTree = "<group>"; };
 		CAI00107 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		CAI00109 /* KeyboardHint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardHint.swift; sourceTree = "<group>"; };
+		CAI00111 /* CaiNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiNotifications.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,7 +116,7 @@
 			children = (
 				CAI00002 /* CaiApp.swift */,
 				CAI00004 /* AppDelegate.swift */,
-				CAI00006 /* ContentView.swift */,
+				CAI00111 /* CaiNotifications.swift */,
 				CAI00076 /* Models */,
 				CAI00077 /* Views */,
 				CAI00041 /* Services */,
@@ -148,6 +150,7 @@
 				CAI00091 /* CustomPromptView.swift */,
 				CAI00093 /* ToastWindow.swift */,
 				CAI00107 /* AboutView.swift */,
+				CAI00109 /* KeyboardHint.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -290,7 +293,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CAI00005 /* ContentView.swift in Sources */,
 				CAI00001 /* CaiApp.swift in Sources */,
 				CAI00003 /* AppDelegate.swift in Sources */,
 				CAI00035 /* PermissionsManager.swift in Sources */,
@@ -315,6 +317,8 @@
 				CAI00102 /* SystemActions.swift in Sources */,
 				CAI00104 /* ActionGenerator.swift in Sources */,
 				CAI00106 /* AboutView.swift in Sources */,
+				CAI00108 /* KeyboardHint.swift in Sources */,
+				CAI00110 /* CaiNotifications.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

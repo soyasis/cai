@@ -8,12 +8,6 @@ actor LLMService {
 
     static let shared = LLMService()
 
-    /// Known provider default base URLs (without trailing /v1)
-    static let providerDefaults: [String: String] = [
-        "lmstudio": "http://127.0.0.1:1234",
-        "ollama": "http://127.0.0.1:11434"
-    ]
-
     // MARK: - Status
 
     struct Status {

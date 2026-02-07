@@ -76,30 +76,30 @@ struct ActionListWindow: View {
         )
         .shadow(color: .black.opacity(0.3), radius: 20, y: 8)
         .shadow(color: .black.opacity(0.1), radius: 2, y: 1)
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiExecuteAction"))) { notification in
+        .onReceive(NotificationCenter.default.publisher(for: .caiExecuteAction)) { notification in
             if let actionId = notification.userInfo?["actionId"] as? String,
                let action = actions.first(where: { $0.id == actionId }) {
                 executeAction(action)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiEscPressed"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiEscPressed)) { _ in
             handleEsc()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiShowClipboardHistory"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiShowClipboardHistory)) { _ in
             handleShowHistory()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiCmdNumber"))) { notification in
+        .onReceive(NotificationCenter.default.publisher(for: .caiCmdNumber)) { notification in
             if let number = notification.userInfo?["number"] as? Int {
                 handleCmdNumber(number)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiArrowUp"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiArrowUp)) { _ in
             handleArrowUp()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiArrowDown"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiArrowDown)) { _ in
             handleArrowDown()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiEnterPressed"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiEnterPressed)) { _ in
             handleEnter()
         }
     }
@@ -223,7 +223,7 @@ struct ActionListWindow: View {
 
     private func copyAndDismissWithToast() {
         NotificationCenter.default.post(
-            name: NSNotification.Name("CaiShowToast"),
+            name: .caiShowToast,
             object: nil,
             userInfo: ["message": "Copied to Clipboard"]
         )
@@ -285,7 +285,7 @@ struct ActionListWindow: View {
             Divider()
                 .background(Color.caiDivider)
             HStack(spacing: 16) {
-                keyboardHint(key: "Esc", label: "Back")
+                KeyboardHint(key: "Esc", label: "Back")
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -323,10 +323,10 @@ struct ActionListWindow: View {
 
     private var mainFooterView: some View {
         HStack(spacing: 12) {
-            keyboardHint(key: "↑↓", label: "Navigate")
-            keyboardHint(key: "↵", label: "Select")
-            keyboardHint(key: "Esc", label: "Close")
-            keyboardHint(key: "⌘0", label: "History")
+            KeyboardHint(key: "↑↓", label: "Navigate")
+            KeyboardHint(key: "↵", label: "Select")
+            KeyboardHint(key: "Esc", label: "Close")
+            KeyboardHint(key: "⌘0", label: "History")
 
             Spacer()
 
@@ -353,24 +353,6 @@ struct ActionListWindow: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-    }
-
-    // MARK: - Keyboard Hint Helper
-
-    private func keyboardHint(key: String, label: String) -> some View {
-        HStack(spacing: 4) {
-            Text(key)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .padding(.horizontal, 4)
-                .padding(.vertical, 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.caiSurface.opacity(0.5))
-                )
-            Text(label)
-                .font(.system(size: 11))
-        }
-        .foregroundColor(.caiTextSecondary.opacity(0.6))
     }
 
     // MARK: - Helpers

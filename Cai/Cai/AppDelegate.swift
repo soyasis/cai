@@ -59,7 +59,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Listen for permission changes to re-register hotkey
         NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("AccessibilityPermissionChanged"),
+            forName: .accessibilityPermissionChanged,
             object: nil,
             queue: .main
         ) { [weak self] _ in

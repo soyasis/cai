@@ -79,9 +79,9 @@ struct ClipboardHistoryView: View {
 
             // Footer
             HStack(spacing: 12) {
-                keyboardHint(key: "↑↓", label: "Navigate")
-                keyboardHint(key: "↵", label: "Copy")
-                keyboardHint(key: "Esc", label: "Back")
+                KeyboardHint(key: "↑↓", label: "Navigate")
+                KeyboardHint(key: "↵", label: "Copy")
+                KeyboardHint(key: "Esc", label: "Back")
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -142,21 +142,4 @@ struct ClipboardHistoryView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    // MARK: - Keyboard Hint
-
-    private func keyboardHint(key: String, label: String) -> some View {
-        HStack(spacing: 4) {
-            Text(key)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .padding(.horizontal, 4)
-                .padding(.vertical, 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.caiSurface.opacity(0.5))
-                )
-            Text(label)
-                .font(.system(size: 11))
-        }
-        .foregroundColor(.caiTextSecondary.opacity(0.6))
-    }
 }

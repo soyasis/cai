@@ -86,7 +86,7 @@ class PermissionsManager: ObservableObject {
                 self.pollTimer = nil
                 if !hadPermission {
                     NotificationCenter.default.post(
-                        name: NSNotification.Name("AccessibilityPermissionChanged"),
+                        name: .accessibilityPermissionChanged,
                         object: nil
                     )
                 }

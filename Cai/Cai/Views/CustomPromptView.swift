@@ -71,11 +71,11 @@ struct CustomPromptView: View {
 
             // Footer
             HStack(spacing: 12) {
-                keyboardHint(key: "Esc", label: "Back")
+                KeyboardHint(key: "Esc", label: "Back")
                 if state.phase == .input {
-                    keyboardHint(key: "⌘↵", label: "Submit")
+                    KeyboardHint(key: "⌘↵", label: "Submit")
                 } else if !isLoading && error == nil {
-                    keyboardHint(key: "↵", label: "Copy")
+                    KeyboardHint(key: "↵", label: "Copy")
                 }
                 Spacer()
             }
@@ -85,7 +85,7 @@ struct CustomPromptView: View {
         .onChange(of: state.phase) { newPhase in
             WindowController.passThrough = (newPhase == .input)
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiCmdEnterPressed"))) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .caiCmdEnterPressed)) { _ in
             if state.phase == .input {
                 submitPrompt()
             }
@@ -214,19 +214,4 @@ struct CustomPromptView: View {
         }
     }
 
-    private func keyboardHint(key: String, label: String) -> some View {
-        HStack(spacing: 4) {
-            Text(key)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .padding(.horizontal, 4)
-                .padding(.vertical, 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.caiSurface.opacity(0.5))
-                )
-            Text(label)
-                .font(.system(size: 11))
-        }
-        .foregroundColor(.caiTextSecondary.opacity(0.6))
-    }
 }

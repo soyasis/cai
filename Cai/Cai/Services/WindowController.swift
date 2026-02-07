@@ -186,7 +186,7 @@ class WindowController: NSObject, ObservableObject {
 
         // Listen for toast notifications from SwiftUI views
         toastObserver = NotificationCenter.default.addObserver(
-            forName: NSNotification.Name("CaiShowToast"),
+            forName: .caiShowToast,
             object: nil,
             queue: .main
         ) { [weak self] notification in
@@ -268,7 +268,7 @@ class WindowController: NSObject, ObservableObject {
         // whether to go back to action list or dismiss entirely.
         if event.keyCode == 53 {
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiEscPressed"),
+                name: .caiEscPressed,
                 object: nil
             )
             return true
@@ -277,7 +277,7 @@ class WindowController: NSObject, ObservableObject {
         // Cmd+Return — always captured (submit in custom prompt, or copy result)
         if event.keyCode == 36 && event.modifierFlags.contains(.command) {
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiCmdEnterPressed"),
+                name: .caiCmdEnterPressed,
                 object: nil
             )
             return true
@@ -294,7 +294,7 @@ class WindowController: NSObject, ObservableObject {
         // Arrow Up
         if event.keyCode == 126 {
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiArrowUp"),
+                name: .caiArrowUp,
                 object: nil
             )
             return true
@@ -303,7 +303,7 @@ class WindowController: NSObject, ObservableObject {
         // Arrow Down
         if event.keyCode == 125 {
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiArrowDown"),
+                name: .caiArrowDown,
                 object: nil
             )
             return true
@@ -312,7 +312,7 @@ class WindowController: NSObject, ObservableObject {
         // Return/Enter
         if event.keyCode == 36 {
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiEnterPressed"),
+                name: .caiEnterPressed,
                 object: nil
             )
             return true
@@ -321,7 +321,7 @@ class WindowController: NSObject, ObservableObject {
         // Cmd+0 — open clipboard history
         if event.modifierFlags.contains(.command) && event.keyCode == 29 {  // 29 = '0'
             NotificationCenter.default.post(
-                name: NSNotification.Name("CaiShowClipboardHistory"),
+                name: .caiShowClipboardHistory,
                 object: nil
             )
             return true
@@ -332,7 +332,7 @@ class WindowController: NSObject, ObservableObject {
             let keyNumber = keyCodeToNumber(event.keyCode)
             if let number = keyNumber, number >= 1 && number <= 9 {
                 NotificationCenter.default.post(
-                    name: NSNotification.Name("CaiCmdNumber"),
+                    name: .caiCmdNumber,
                     object: nil,
                     userInfo: ["number": number]
                 )
