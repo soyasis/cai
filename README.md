@@ -138,6 +138,29 @@ Left-click the Cai menu bar icon (or click the logo in the action window footer)
 - **Accessibility permission** (for global hotkey ⌥C)
 - **Local LLM server** (optional — for AI-powered actions only)
 
+## Troubleshooting
+
+**"Cai can't be opened because Apple cannot check it for malicious software"**
+Right-click the app and select **Open**, or remove the quarantine flag:
+```bash
+xattr -cr /Applications/Cai.app
+```
+
+**Global shortcut ⌥C doesn't work**
+- Check **System Settings → Privacy & Security → Accessibility** — make sure Cai is listed and enabled
+- If it's listed but still not working, remove Cai from the list and re-add it
+- Make sure no other app is using ⌥C (e.g., Raycast, Alfred, BetterTouchTool)
+
+**LLM not connecting**
+- Verify your server is running: `curl http://127.0.0.1:1234/v1/models`
+- Check that the URL in Preferences matches your server's address and port
+- Ollama uses port `11434`, LM Studio uses `1234` — make sure you selected the right provider
+
+**Date/meeting not detected**
+- Detection works best with English dates ("Tuesday at 3pm", "lunch tomorrow at noon")
+- Try rephrasing: "3pm tomorrow" instead of "tomorrow 15h"
+- Some informal formats may not be recognized — explicit dates work most reliably
+
 ## Tech Stack
 
 - **SwiftUI** + **AppKit** (native macOS, no Electron)
