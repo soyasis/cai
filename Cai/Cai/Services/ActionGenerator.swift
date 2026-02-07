@@ -177,6 +177,42 @@ struct ActionGenerator {
 
         // MARK: URL
         case .url:
+            // If there's substantial text beyond the URL, show AI actions first
+            // (e.g. an email containing a link — user likely wants to understand the text).
+            // AI actions come before navigation to match the ordering principle used
+            // across all content types: LLM actions first, system actions last.
+            let textBeyondURL: Int = {
+                if let urlString = detection.entities.url {
+                    return text.replacingOccurrences(of: urlString, with: "")
+                        .trimmingCharacters(in: .whitespacesAndNewlines).count
+                }
+                return 0
+            }()
+            if textBeyondURL > 30 {
+                if text.count >= 100 {
+                    items.append(ActionItem(
+                        id: "summarize",
+                        title: "Summarize",
+                        subtitle: "Create a concise summary",
+                        icon: "text.redaction",
+                        shortcut: shortcut,
+                        type: .llmAction(.summarize)
+                    ))
+                    shortcut += 1
+                }
+
+                items.append(ActionItem(
+                    id: "explain",
+                    title: "Explain",
+                    subtitle: "Get an explanation",
+                    icon: "lightbulb",
+                    shortcut: shortcut,
+                    type: .llmAction(.explain)
+                ))
+                shortcut += 1
+            }
+
+            // Open in Browser — last for URL+text, ⌘2 for bare URLs
             if let urlString = detection.entities.url, let url = URL(string: urlString) {
                 items.append(ActionItem(
                     id: "open_url",
