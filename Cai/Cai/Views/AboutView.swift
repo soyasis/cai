@@ -40,7 +40,7 @@ struct AboutView: View {
 
             // GitHub link
             Button(action: {
-                if let url = URL(string: "https://github.com/anthropics/cai") {
+                if let url = URL(string: "https://github.com/soyasis/cai") {
                     NSWorkspace.shared.open(url)
                 }
             }) {
