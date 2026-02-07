@@ -29,11 +29,21 @@ class WindowController: NSObject, ObservableObject {
     private var window: NSWindow?
     private var toastWindow: NSWindow?
     private var actions: [ActionItem] = []
+    private var currentText: String?
     private var selectionState = SelectionState()
     private var localMonitor: Any?
     private var globalMonitor: Any?
     private var keyMonitor: Any?
     private var toastObserver: NSObjectProtocol?
+
+    /// Resume support: keep the last-dismissed window alive briefly so
+    /// reopening with the same clipboard text restores the exact view state.
+    private var cachedWindow: NSWindow?
+    private var cachedText: String?
+    private var cachedPassThrough: Bool = false
+    private var cachedDismissTime: Date?
+    private var cacheCleanupTimer: Timer?
+    private static let resumeTimeout: TimeInterval = 10
 
     /// Layout constants
     private static let windowWidth: CGFloat = 500
@@ -61,6 +71,43 @@ class WindowController: NSObject, ObservableObject {
         // If window is already visible, dismiss first
         hideWindow()
 
+        // Resume: if reopened with the same text within the timeout, restore the
+        // previous window (preserving result view, custom prompt state, etc.)
+        if let cached = cachedWindow,
+           let cachedText = cachedText,
+           let dismissTime = cachedDismissTime,
+           cachedText == text,
+           Date().timeIntervalSince(dismissTime) < Self.resumeTimeout {
+            print("♻️ Resuming previous window (dismissed \(String(format: "%.1f", Date().timeIntervalSince(dismissTime)))s ago)")
+            self.window = cached
+            Self.passThrough = cachedPassThrough
+            self.cachedWindow = nil
+            self.cachedText = nil
+            self.cachedPassThrough = false
+            self.cachedDismissTime = nil
+            cacheCleanupTimer?.invalidate()
+            cacheCleanupTimer = nil
+
+            cached.alphaValue = 0
+            NSApp.activate(ignoringOtherApps: true)
+            cached.makeKeyAndOrderFront(nil)
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.15
+                cached.animator().alphaValue = 1
+            }
+
+            // Re-focus the content view so TextEditor regains keyboard input
+            DispatchQueue.main.async {
+                cached.makeFirstResponder(cached.contentView)
+            }
+
+            installEventMonitors()
+            return
+        }
+
+        // Not resuming — clear any stale cache
+        clearCache()
+
         let settings = CaiSettings.shared
         let actions = ActionGenerator.generateActions(
             for: text,
@@ -68,6 +115,7 @@ class WindowController: NSObject, ObservableObject {
             settings: settings
         )
         self.actions = actions
+        self.currentText = text
 
         // Reset selection state
         selectionState = SelectionState()
@@ -149,6 +197,45 @@ class WindowController: NSObject, ObservableObject {
             panel.animator().alphaValue = 1
         }
 
+        installEventMonitors()
+
+        print("Action window shown with \(actions.count) actions (height: \(windowHeight))")
+    }
+
+    func hideWindow() {
+        // Save window position before dismissing
+        if let origin = window?.frame.origin {
+            Self.saveWindowPosition(origin)
+        }
+        removeEventMonitors()
+
+        // Cache the window for potential resume instead of destroying it.
+        // The SwiftUI view hierarchy stays alive, preserving result/prompt state.
+        if let window = window {
+            window.alphaValue = 0
+            window.orderOut(nil)
+
+            // Replace any previous cache
+            cachedWindow = window
+            cachedText = currentText
+            cachedPassThrough = Self.passThrough
+            cachedDismissTime = Date()
+
+            // Auto-destroy the cache after the resume timeout
+            cacheCleanupTimer?.invalidate()
+            cacheCleanupTimer = Timer.scheduledTimer(withTimeInterval: Self.resumeTimeout, repeats: false) { [weak self] _ in
+                self?.clearCache()
+            }
+        }
+        Self.passThrough = false
+        window = nil
+        currentText = nil
+        actions = []
+    }
+
+    // MARK: - Event Monitors
+
+    private func installEventMonitors() {
         // Monitor for clicks outside the window to dismiss (LOCAL events — within our app)
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
             guard let self = self, let window = self.window else { return event }
@@ -193,15 +280,9 @@ class WindowController: NSObject, ObservableObject {
             let message = notification.userInfo?["message"] as? String ?? "Copied to Clipboard"
             self?.showToast(message: message)
         }
-
-        print("Action window shown with \(actions.count) actions (height: \(windowHeight))")
     }
 
-    func hideWindow() {
-        // Save window position before dismissing
-        if let origin = window?.frame.origin {
-            Self.saveWindowPosition(origin)
-        }
+    private func removeEventMonitors() {
         if let localMonitor = localMonitor {
             NSEvent.removeMonitor(localMonitor)
             self.localMonitor = nil
@@ -218,17 +299,15 @@ class WindowController: NSObject, ObservableObject {
             NotificationCenter.default.removeObserver(toastObserver)
             self.toastObserver = nil
         }
-        Self.passThrough = false
+    }
 
-        // Remove window immediately to avoid race conditions
-        // (e.g., rapid hotkey double-tap creating a new window before
-        // an animation completion handler clears the old one)
-        if let window = window {
-            window.alphaValue = 0
-            window.orderOut(nil)
-        }
-        window = nil
-        actions = []
+    private func clearCache() {
+        cachedWindow?.orderOut(nil)
+        cachedWindow = nil
+        cachedText = nil
+        cachedDismissTime = nil
+        cacheCleanupTimer?.invalidate()
+        cacheCleanupTimer = nil
     }
 
     // MARK: - Position Persistence
