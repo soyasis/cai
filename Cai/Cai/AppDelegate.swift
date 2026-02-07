@@ -50,14 +50,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         permissionsManager.checkAccessibilityPermission()
         permissionsManager.recheckPermissionWhenAppBecomesActive()
 
-        // Trigger the system prompt to add Cai to System Settings
+        // Show custom permission alert (without triggering the duplicate system prompt)
         if !permissionsManager.hasAccessibilityPermission {
-            permissionsManager.requestAccessibilityPermission()
-
-            // Show our alert after a delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                self?.permissionsManager.showPermissionAlert()
-            }
+            permissionsManager.showPermissionAlert()
         }
 
         // Setup global hotkey (Option+C)

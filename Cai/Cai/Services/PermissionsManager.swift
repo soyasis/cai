@@ -44,14 +44,9 @@ class PermissionsManager: ObservableObject {
         let alert = NSAlert()
         alert.messageText = "Accessibility Permission Required"
         alert.informativeText = """
-        Cai needs accessibility permission to register global keyboard shortcuts.
+        Cai needs accessibility permission for the ⌥C hotkey to work.
 
-        This allows you to:
-        • Use ⌥C (Option+C) to capture clipboard content from anywhere
-        • Access Cai without switching apps
-
-        Click "Open System Settings" to grant permission.
-        Then enable Cai in the Accessibility list and return to the app.
+        Enable Cai in System Settings → Accessibility.
         """
         alert.alertStyle = .informational
         if let logo = NSImage(named: "CaiLogo") {
