@@ -66,8 +66,8 @@ struct ResultView: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Error: \(error)")
                 } else {
-                    Text(result)
-                        .font(.system(size: 13, design: .monospaced))
+                    Text(markdownAttributedString(from: result))
+                        .font(.system(size: 13))
                         .foregroundColor(.caiTextPrimary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -126,5 +126,22 @@ struct ResultView: View {
 
     private func copyToClipboard(_ text: String) {
         SystemActions.copyToClipboard(text)
+    }
+
+    /// Parses a markdown string into an AttributedString for rich rendering.
+    /// Falls back to plain text if markdown parsing fails.
+    private func markdownAttributedString(from text: String) -> AttributedString {
+        do {
+            var attributed = try AttributedString(
+                markdown: text,
+                options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+            )
+            // Ensure our default font and color are applied
+            attributed.font = .system(size: 13)
+            attributed.foregroundColor = .caiTextPrimary
+            return attributed
+        } catch {
+            return AttributedString(text)
+        }
     }
 }

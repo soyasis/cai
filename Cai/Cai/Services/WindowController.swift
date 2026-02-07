@@ -40,8 +40,8 @@ class WindowController: NSObject, ObservableObject {
     private static let headerHeight: CGFloat = 52
     private static let footerHeight: CGFloat = 36
     private static let dividerHeight: CGFloat = 1
-    private static let rowHeight: CGFloat = 42  // 7 + 28 + 7 padding
-    private static let listVerticalPadding: CGFloat = 12  // 6 top + 6 bottom
+    private static let rowHeight: CGFloat = 46  // 7 + ~30 content + 7 padding + 2 spacing
+    private static let listVerticalPadding: CGFloat = 16  // 6 top + 6 bottom + extra buffer
     private static let maxWindowHeight: CGFloat = 600
     private static let cornerRadius: CGFloat = 20
 
