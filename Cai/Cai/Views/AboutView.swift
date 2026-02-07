@@ -15,9 +15,11 @@ struct AboutView: View {
             Spacer().frame(height: 4)
 
             // App icon
-            Image(systemName: "clipboard")
-                .font(.system(size: 40, weight: .light))
-                .foregroundColor(.caiPrimary)
+            Image("CaiLogo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             // App name
             VStack(spacing: 4) {

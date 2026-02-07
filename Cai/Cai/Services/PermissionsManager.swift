@@ -54,6 +54,9 @@ class PermissionsManager: ObservableObject {
         Then enable Cai in the Accessibility list and return to the app.
         """
         alert.alertStyle = .informational
+        if let logo = NSImage(named: "CaiLogo") {
+            alert.icon = logo
+        }
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Cancel")
 
