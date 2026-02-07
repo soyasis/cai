@@ -7,6 +7,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let hotKeyManager = HotKeyManager()
     private let clipboardService = ClipboardService.shared
     private let contentDetector = ContentDetector.shared
+    private let windowController = WindowController()
     private let permissionsManager = PermissionsManager.shared
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -27,11 +28,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("❌ Failed to create status bar button")
         }
 
-        // Create popover for left-click
+        // Create popover for left-click — shows settings
         popover = NSPopover()
-        popover?.contentSize = NSSize(width: 400, height: 300)
+        popover?.contentSize = NSSize(width: 340, height: 380)
         popover?.behavior = .transient
-        popover?.contentViewController = NSHostingController(rootView: ContentView())
+        popover?.contentViewController = NSHostingController(rootView: SettingsView())
 
         // Check accessibility permission
         permissionsManager.checkAccessibilityPermission()
@@ -70,16 +71,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Right-click: show menu
             showMenu()
         } else {
-            // Left-click: toggle popover
+            // Left-click: toggle settings popover
             togglePopover()
         }
     }
 
     func showMenu() {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Open Cai", action: #selector(openCai), keyEquivalent: "o"))
+        menu.addItem(NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit Cai", action: #selector(quitApp), keyEquivalent: "q"))
 
         statusItem?.menu = menu
         statusItem?.button?.performClick(nil)
@@ -98,7 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func openCai() {
+    @objc func openSettings() {
         togglePopover()
     }
 
@@ -116,33 +117,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func handleHotKeyTrigger() {
         print("🔥 Hotkey triggered!")
 
+        // If the action window is already visible, dismiss it (toggle behavior)
+        if windowController.isVisible {
+            windowController.hideWindow()
+            return
+        }
+
         // First, copy any selected text (simulates Cmd+C)
         clipboardService.copySelectedText { [weak self] in
-            // Then read the clipboard content after copy completes
-            if let content = self?.clipboardService.readClipboard() {
+            guard let self = self else { return }
+
+            // Read clipboard — works whether Cmd+C copied new text or clipboard already had content.
+            // This means Option+C with no selection will re-use the last clipboard contents.
+            if let content = self.clipboardService.readClipboard() {
                 print("📋 Clipboard content: \(content)")
 
                 // Detect content type
-                if let result = self?.contentDetector.detect(content) {
-                    print("🔍 Detected: \(result.type.rawValue) (confidence: \(result.confidence))")
-                    if let url = result.entities.url {
-                        print("   🔗 URL: \(url)")
-                    }
-                    if let address = result.entities.address {
-                        print("   📍 Address: \(address)")
-                    }
-                    if let date = result.entities.date {
-                        print("   📅 Date: \(date)")
-                    }
-                    if let dateText = result.entities.dateText {
-                        print("   📅 Date text: \(dateText)")
-                    }
-                    if let location = result.entities.location {
-                        print("   📍 Meeting location: \(location)")
-                    }
-                }
+                let detection = self.contentDetector.detect(content)
+                print("🔍 Detected: \(detection.type.rawValue) (confidence: \(detection.confidence))")
+
+                // Show the floating action window
+                self.windowController.showActionWindow(text: content, detection: detection)
             } else {
-                print("⚠️ Clipboard is empty")
+                print("⚠️ Clipboard is empty — nothing to show")
             }
         }
     }

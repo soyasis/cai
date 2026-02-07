@@ -17,6 +17,16 @@
 		CAI00039 /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00040 /* ClipboardService.swift */; };
 		CAI00042 /* ContentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00043 /* ContentDetector.swift */; };
 		CAI00050 /* ContentDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00051 /* ContentDetectorTests.swift */; };
+		CAI00062 /* ActionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00063 /* ActionItem.swift */; };
+		CAI00064 /* VisualEffectBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00065 /* VisualEffectBackground.swift */; };
+		CAI00066 /* CaiColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00067 /* CaiColors.swift */; };
+		CAI00068 /* ActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00069 /* ActionRow.swift */; };
+		CAI00070 /* ActionListWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00071 /* ActionListWindow.swift */; };
+		CAI00072 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00073 /* ResultView.swift */; };
+		CAI00074 /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00075 /* WindowController.swift */; };
+		CAI00080 /* CaiSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00081 /* CaiSettings.swift */; };
+		CAI00082 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00083 /* SettingsView.swift */; };
+		CAI00084 /* CaiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00085 /* CaiLogo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +53,16 @@
 		CAI00043 /* ContentDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetector.swift; sourceTree = "<group>"; };
 		CAI00049 /* CaiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAI00051 /* ContentDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentDetectorTests.swift; sourceTree = "<group>"; };
+		CAI00063 /* ActionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionItem.swift; sourceTree = "<group>"; };
+		CAI00065 /* VisualEffectBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectBackground.swift; sourceTree = "<group>"; };
+		CAI00067 /* CaiColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiColors.swift; sourceTree = "<group>"; };
+		CAI00069 /* ActionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionRow.swift; sourceTree = "<group>"; };
+		CAI00071 /* ActionListWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionListWindow.swift; sourceTree = "<group>"; };
+		CAI00073 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
+		CAI00075 /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
+		CAI00081 /* CaiSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiSettings.swift; sourceTree = "<group>"; };
+		CAI00083 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CAI00085 /* CaiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiLogo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,12 +99,37 @@
 				CAI00002 /* CaiApp.swift */,
 				CAI00004 /* AppDelegate.swift */,
 				CAI00006 /* ContentView.swift */,
+				CAI00076 /* Models */,
+				CAI00077 /* Views */,
 				CAI00041 /* Services */,
 				CAI00008 /* Assets.xcassets */,
 				CAI00010 /* Info.plist */,
 				CAI00011 /* Cai.entitlements */,
 			);
 			path = Cai;
+			sourceTree = "<group>";
+		};
+		CAI00076 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				CAI00063 /* ActionItem.swift */,
+				CAI00081 /* CaiSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		CAI00077 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CAI00067 /* CaiColors.swift */,
+				CAI00065 /* VisualEffectBackground.swift */,
+				CAI00069 /* ActionRow.swift */,
+				CAI00071 /* ActionListWindow.swift */,
+				CAI00073 /* ResultView.swift */,
+				CAI00083 /* SettingsView.swift */,
+				CAI00085 /* CaiLogo.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		CAI00041 /* Services */ = {
@@ -94,6 +139,7 @@
 				CAI00038 /* HotKeyManager.swift */,
 				CAI00040 /* ClipboardService.swift */,
 				CAI00043 /* ContentDetector.swift */,
+				CAI00075 /* WindowController.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -227,6 +273,16 @@
 				CAI00037 /* HotKeyManager.swift in Sources */,
 				CAI00039 /* ClipboardService.swift in Sources */,
 				CAI00042 /* ContentDetector.swift in Sources */,
+				CAI00062 /* ActionItem.swift in Sources */,
+				CAI00064 /* VisualEffectBackground.swift in Sources */,
+				CAI00066 /* CaiColors.swift in Sources */,
+				CAI00068 /* ActionRow.swift in Sources */,
+				CAI00070 /* ActionListWindow.swift in Sources */,
+				CAI00072 /* ResultView.swift in Sources */,
+				CAI00074 /* WindowController.swift in Sources */,
+				CAI00080 /* CaiSettings.swift in Sources */,
+				CAI00082 /* SettingsView.swift in Sources */,
+				CAI00084 /* CaiLogo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
