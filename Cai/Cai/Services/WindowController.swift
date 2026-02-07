@@ -23,6 +23,9 @@ class SelectionState: ObservableObject {
 /// that hosts the SwiftUI ActionListWindow view. Handles positioning, keyboard
 /// events (arrow keys, Enter, ESC, Cmd+1-9), and dismiss-on-click-outside.
 class WindowController: NSObject, ObservableObject {
+    /// When true, text-input keys (Return, arrows) pass through to the focused text field
+    /// instead of being consumed by the keyboard handler. Set by views with text input.
+    static var passThrough = false
     private var window: NSWindow?
     private var actions: [ActionItem] = []
     private var selectionState = SelectionState()
@@ -168,6 +171,7 @@ class WindowController: NSObject, ObservableObject {
             NSEvent.removeMonitor(globalMonitor)
             self.globalMonitor = nil
         }
+        Self.passThrough = false
         window?.orderOut(nil)
         window = nil
         actions = []
@@ -215,6 +219,13 @@ class WindowController: NSObject, ObservableObject {
                 object: nil
             )
             return true
+        }
+
+        // When a text field is active, let Return and arrows pass through
+        if Self.passThrough {
+            if event.keyCode == 126 || event.keyCode == 125 || event.keyCode == 36 {
+                return false
+            }
         }
 
         // Arrow Up
