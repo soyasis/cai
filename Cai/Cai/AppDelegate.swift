@@ -119,7 +119,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func openCai() {
-        handleHotKeyTrigger()
+        // Use whatever is already on the clipboard — don't simulate Cmd+C
+        // because by the time the user clicks this menu item, the frontmost
+        // app is Cai itself (or the menu bar), not the app with selected text.
+        openWithClipboard()
     }
 
     @objc func showAbout() {
