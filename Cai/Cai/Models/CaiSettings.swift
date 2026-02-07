@@ -113,7 +113,15 @@ class CaiSettings: ObservableObject {
         let mapsRaw = defaults.string(forKey: Keys.mapsProvider) ?? MapsProvider.apple.rawValue
         self.mapsProvider = MapsProvider(rawValue: mapsRaw) ?? .apple
 
-        self.launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
+        // Default to true for launch at login — bool(forKey:) returns false when key is absent,
+        // so we check if the key has ever been set explicitly.
+        if defaults.object(forKey: Keys.launchAtLogin) != nil {
+            self.launchAtLogin = defaults.bool(forKey: Keys.launchAtLogin)
+        } else {
+            self.launchAtLogin = true
+            defaults.set(true, forKey: Keys.launchAtLogin)
+            updateLaunchAtLogin(true)
+        }
     }
 
     // MARK: - Launch at Login
