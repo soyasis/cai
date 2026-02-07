@@ -13,7 +13,9 @@ struct ActionListWindow: View {
     @State private var resultGenerator: (() async throws -> String)?
     @State private var showSettings: Bool = false
     @State private var showHistory: Bool = false
+    @State private var showCustomPrompt: Bool = false
     @StateObject private var historySelectionState = SelectionState()
+    @StateObject private var customPromptState = CustomPromptState()
 
     /// Corner radius matching Spotlight's rounded appearance
     private let cornerRadius: CGFloat = 20
@@ -23,18 +25,24 @@ struct ActionListWindow: View {
         if showSettings { return .settings }
         if showHistory { return .history }
         if showResult { return .result }
+        if showCustomPrompt { return .customPrompt }
         return .actions
     }
 
     private enum Screen {
-        case actions, result, settings, history
+        case actions, result, settings, history, customPrompt
     }
 
     var body: some View {
         ZStack {
             VisualEffectBackground()
 
-            if showSettings {
+            if showCustomPrompt {
+                CustomPromptView(
+                    clipboardText: text,
+                    state: customPromptState
+                )
+            } else if showSettings {
                 settingsContent
             } else if showHistory {
                 ClipboardHistoryView(
@@ -97,7 +105,20 @@ struct ActionListWindow: View {
     // MARK: - Keyboard Routing
 
     private func handleEsc() {
-        if showSettings {
+        if showCustomPrompt {
+            if customPromptState.phase == .result {
+                // Go back from result to input phase
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    customPromptState.phase = .input
+                }
+            } else {
+                // Go back from input to actions
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    showCustomPrompt = false
+                    customPromptState.reset()
+                }
+            }
+        } else if showSettings {
             withAnimation(.easeInOut(duration: 0.15)) {
                 showSettings = false
             }
@@ -186,6 +207,8 @@ struct ActionListWindow: View {
             guard index < entries.count else { return }
             ClipboardHistory.shared.copyEntry(entries[index])
             onDismiss()
+        case .customPrompt:
+            break  // CustomPromptView handles its own Enter
         default:
             break
         }
@@ -383,6 +406,12 @@ struct ActionListWindow: View {
             pasteboard.clearContents()
             pasteboard.setString(copyText, forType: .string)
             onDismiss()
+
+        case .customPrompt:
+            customPromptState.reset()
+            withAnimation(.easeInOut(duration: 0.15)) {
+                showCustomPrompt = true
+            }
 
         default:
             onExecute(action)

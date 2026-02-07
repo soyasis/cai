@@ -29,6 +29,7 @@
 		CAI00084 /* CaiLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00085 /* CaiLogo.swift */; };
 		CAI00086 /* ClipboardHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00087 /* ClipboardHistory.swift */; };
 		CAI00088 /* ClipboardHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00089 /* ClipboardHistoryView.swift */; };
+		CAI00090 /* CustomPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAI00091 /* CustomPromptView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		CAI00085 /* CaiLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaiLogo.swift; sourceTree = "<group>"; };
 		CAI00087 /* ClipboardHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistory.swift; sourceTree = "<group>"; };
 		CAI00089 /* ClipboardHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardHistoryView.swift; sourceTree = "<group>"; };
+		CAI00091 /* CustomPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPromptView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 				CAI00083 /* SettingsView.swift */,
 				CAI00085 /* CaiLogo.swift */,
 				CAI00089 /* ClipboardHistoryView.swift */,
+				CAI00091 /* CustomPromptView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -291,6 +294,7 @@
 				CAI00084 /* CaiLogo.swift in Sources */,
 				CAI00086 /* ClipboardHistory.swift in Sources */,
 				CAI00088 /* ClipboardHistoryView.swift in Sources */,
+				CAI00090 /* CustomPromptView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
