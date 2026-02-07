@@ -220,20 +220,15 @@ class WindowController: NSObject, ObservableObject {
         }
         Self.passThrough = false
 
-        // Fade out, then remove
+        // Remove window immediately to avoid race conditions
+        // (e.g., rapid hotkey double-tap creating a new window before
+        // an animation completion handler clears the old one)
         if let window = window {
-            NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.12
-                window.animator().alphaValue = 0
-            }, completionHandler: { [weak self] in
-                self?.window?.orderOut(nil)
-                self?.window = nil
-                self?.actions = []
-            })
-        } else {
-            window = nil
-            actions = []
+            window.alphaValue = 0
+            window.orderOut(nil)
         }
+        window = nil
+        actions = []
     }
 
     // MARK: - Position Persistence
