@@ -83,8 +83,8 @@ All text types also get **Custom Action** (⌘1) for free-form AI prompts.
 
 ### Download
 
-1. Download `Cai.zip` from the [latest release](../../releases/latest)
-2. Unzip and drag **Cai.app** to your Applications folder
+1. Download the `.dmg` from the [latest release](../../releases/latest)
+2. Open the DMG and drag **Cai.app** to your Applications folder
 3. **Right-click → Open** on first launch (required for unsigned apps)
 4. Grant Accessibility permission when prompted
 5. Configure your LLM server in Preferences (left-click menu bar icon)
