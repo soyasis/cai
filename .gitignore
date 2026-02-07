@@ -91,5 +91,8 @@ iOSInjectionProject/
 # macOS
 .DS_Store
 
+# Claude Code
+.claude/
+
 # Documentation
 _docs/
