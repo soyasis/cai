@@ -34,7 +34,7 @@ struct ActionListWindow: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             VisualEffectBackground()
 
             if showCustomPrompt {
@@ -49,7 +49,7 @@ struct ActionListWindow: View {
                     selectionState: historySelectionState,
                     onSelect: { entry in
                         ClipboardHistory.shared.copyEntry(entry)
-                        onDismiss()
+                        copyAndDismissWithToast()
                     },
                     onBack: {
                         withAnimation(.easeInOut(duration: 0.15)) {
@@ -159,7 +159,7 @@ struct ActionListWindow: View {
             guard historyIndex >= 0, historyIndex < entries.count else { return }
             historySelectionState.selectedIndex = historyIndex
             ClipboardHistory.shared.copyEntry(entries[historyIndex])
-            onDismiss()
+            copyAndDismissWithToast()
         default:
             break
         }
@@ -206,12 +206,31 @@ struct ActionListWindow: View {
             let index = historySelectionState.selectedIndex
             guard index < entries.count else { return }
             ClipboardHistory.shared.copyEntry(entries[index])
-            onDismiss()
+            copyAndDismissWithToast()
+        case .result:
+            // Copy result and dismiss with toast
+            copyAndDismissWithToast()
         case .customPrompt:
-            break  // CustomPromptView handles its own Enter
+            if customPromptState.phase == .result {
+                // Copy result and dismiss with toast
+                copyAndDismissWithToast()
+            }
+            // Input phase: Enter passes through to TextEditor (handled by passThrough)
         default:
             break
         }
+    }
+
+    /// Dismiss window and show "Copied to Clipboard" toast.
+    /// The result is already auto-copied on load, so this just confirms and closes.
+    /// Note: post toast notification BEFORE dismissing, since dismiss removes the observer.
+    private func copyAndDismissWithToast() {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("CaiShowToast"),
+            object: nil,
+            userInfo: ["message": "Copied to Clipboard"]
+        )
+        onDismiss()
     }
 
     private func goBackToActions() {

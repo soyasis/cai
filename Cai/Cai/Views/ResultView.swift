@@ -3,7 +3,8 @@ import SwiftUI
 /// Shows the result of an action (LLM response, pretty-printed JSON, etc.)
 /// inside the floating window, replacing the action list.
 /// The result is automatically copied to the clipboard.
-/// ESC returns to the action list (handled by parent), not dismiss.
+/// Press Enter to copy and dismiss (toast shows confirmation).
+/// ESC returns to the action list (handled by parent).
 struct ResultView: View {
     let title: String
     let onBack: () -> Void
@@ -11,7 +12,6 @@ struct ResultView: View {
     @State private var result: String = ""
     @State private var isLoading: Bool = true
     @State private var error: String?
-    @State private var copied: Bool = false
 
     /// Async generator that produces the result string.
     let generator: () async throws -> String
@@ -29,17 +29,6 @@ struct ResultView: View {
                     .foregroundColor(.caiTextPrimary)
 
                 Spacer()
-
-                if copied {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 11))
-                        Text("Copied")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundColor(.green)
-                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -90,7 +79,7 @@ struct ResultView: View {
                 keyboardHint(key: "Esc", label: "Back")
                 Spacer()
                 if !isLoading && error == nil {
-                    keyboardHint(key: "⌘V", label: "Paste result")
+                    keyboardHint(key: "↵", label: "Copy")
                 }
             }
             .padding(.horizontal, 16)
@@ -103,16 +92,8 @@ struct ResultView: View {
                     result = output
                     isLoading = false
                 }
-                // Auto-copy to clipboard
+                // Auto-copy to clipboard (silent — toast shows on Enter)
                 copyToClipboard(output)
-                withAnimation(.spring(response: 0.3)) {
-                    copied = true
-                }
-                // Reset copied indicator after 2 seconds
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                withAnimation {
-                    copied = false
-                }
             } catch {
                 withAnimation {
                     self.error = error.localizedDescription

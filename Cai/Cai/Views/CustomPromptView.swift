@@ -25,7 +25,6 @@ struct CustomPromptView: View {
     @State private var result: String = ""
     @State private var isLoading: Bool = false
     @State private var error: String?
-    @State private var copied: Bool = false
 
     @FocusState private var isPromptFocused: Bool
 
@@ -50,17 +49,6 @@ struct CustomPromptView: View {
                 }
 
                 Spacer()
-
-                if copied {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 11))
-                        Text("Copied")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundColor(.green)
-                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -82,9 +70,9 @@ struct CustomPromptView: View {
             HStack(spacing: 12) {
                 keyboardHint(key: "Esc", label: "Back")
                 if state.phase == .input {
-                    keyboardHint(key: "↵", label: "Submit")
+                    keyboardHint(key: "⌘↵", label: "Submit")
                 } else if !isLoading && error == nil {
-                    keyboardHint(key: "⌘V", label: "Paste result")
+                    keyboardHint(key: "↵", label: "Copy")
                 }
                 Spacer()
             }
@@ -93,6 +81,11 @@ struct CustomPromptView: View {
         }
         .onChange(of: state.phase) { newPhase in
             WindowController.passThrough = (newPhase == .input)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CaiCmdEnterPressed"))) { _ in
+            if state.phase == .input {
+                submitPrompt()
+            }
         }
     }
 
@@ -105,23 +98,33 @@ struct CustomPromptView: View {
                 .foregroundColor(.caiTextSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            TextField("e.g. Rewrite formally, Extract key points, Convert to bullet list...", text: $prompt)
-                .textFieldStyle(.plain)
-                .font(.system(size: 13))
-                .foregroundColor(.caiTextPrimary)
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.caiSurface.opacity(0.6))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color.caiDivider.opacity(0.5), lineWidth: 0.5)
-                )
-                .focused($isPromptFocused)
-                .onSubmit {
-                    submitPrompt()
+            // Multiline TextEditor with placeholder
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.caiSurface.opacity(0.6))
+
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color.caiDivider.opacity(0.5), lineWidth: 0.5)
+
+                TextEditor(text: $prompt)
+                    .font(.system(size: 13))
+                    .foregroundColor(.caiTextPrimary)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .padding(8)
+                    .focused($isPromptFocused)
+
+                // Placeholder (TextEditor has no native placeholder)
+                if prompt.isEmpty {
+                    Text("e.g. Rewrite formally, Extract key points, Convert to bullet list...")
+                        .font(.system(size: 13))
+                        .foregroundColor(.caiTextSecondary.opacity(0.5))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 16)
+                        .allowsHitTesting(false)
                 }
+            }
+            .frame(height: 80)
         }
         .padding(16)
         .onAppear {
@@ -194,19 +197,10 @@ struct CustomPromptView: View {
                     result = output
                     isLoading = false
                 }
+                // Auto-copy to clipboard (silent — toast shows on Enter)
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()
                 pasteboard.setString(output, forType: .string)
-                withAnimation(.spring(response: 0.3)) {
-                    copied = true
-                }
-            }
-
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
-            await MainActor.run {
-                withAnimation {
-                    copied = false
-                }
             }
         }
     }
